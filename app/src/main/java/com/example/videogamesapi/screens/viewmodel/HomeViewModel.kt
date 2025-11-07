@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.videogamesapi.data.MyGamesRepository
 import com.example.videogamesapi.models.Category
 import com.example.videogamesapi.models.Games
+import com.example.videogamesapi.models.News
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -24,6 +25,9 @@ class HomeViewModel(
     private val _recommendedGames = MutableStateFlow<List<Games>>(emptyList())
     val recommendedGames: StateFlow<List<Games>> = _recommendedGames
 
+    private val _news = MutableStateFlow<List<News>>(emptyList())
+    val news: StateFlow<List<News>> = _news
+
     init {
         loadHomeData()
     }
@@ -35,6 +39,7 @@ class HomeViewModel(
             _trendingGames.value = repository.getTrendingGames()
             _newGames.value = repository.getNewGames()
             _recommendedGames.value = repository.getRecommendedGames()
+            _news.value = repository.getNews()
         }
     }
 
