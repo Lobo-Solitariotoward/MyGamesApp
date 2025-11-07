@@ -384,5 +384,5 @@ fun AppBottomNavigationBar() {
 @Preview(showBackground = true)
 @Composable
 fun HomeScreenPreview() {
-    HomeScreen(viewModel = HomeViewModel())
+    HomeScreen() // no usar HomeViewModel() directamente aquí
 }

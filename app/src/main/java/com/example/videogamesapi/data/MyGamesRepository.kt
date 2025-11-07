@@ -24,6 +24,12 @@ class MyGamesRepository (){
         Games(203, "Elden Ring", "Souls-like RPG", "https://www.masgamers.com/wp-content/uploads/2022/01/image-30.jpeg"),
     )
 
+    private val mockRecommendedGames = listOf(
+        Games(301, "God of War Ragnarok", "Action - Adventure", "https://as01.epimg.net/meristation/imagenes/2022/11/09/noticias/1668002063_051408_1668002131_noticia_normal.jpg"),
+        Games(302, "Cyberpunk 2077", "RPG - Action", "https://cdn1.epicgames.com/salesEvent/salesEvent/EGS_Cyberpunk2077_CDProjektRed_S2_1200x1600-4f8f0f4f5e4f4e1f3e6e3b3c6e2e1f3d?h=854&resize=1&w=640"),
+        Games(303, "Red Dead Redemption 2", "Action - Adventure", "https://www.rockstargames.com/reddeadredemption2/assets/images/header-social.jpg"),
+    )
+
     fun getCategories(): List<Category> {
         return mockCategories
     }
@@ -34,6 +40,10 @@ class MyGamesRepository (){
 
     fun getNewGames(): List<Games> {
         return mockNewGames
+    }
+
+    fun getRecommendedGames(): List<Games> {
+        return mockRecommendedGames
     }
 
 }
