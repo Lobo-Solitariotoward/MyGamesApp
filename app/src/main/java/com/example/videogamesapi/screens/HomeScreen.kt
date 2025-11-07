@@ -45,6 +45,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -61,6 +62,7 @@ fun HomeScreen(
     val categoriesState by viewModel.categories.collectAsState()
     val trendingGamesState by viewModel.trendingGames.collectAsState()
     val newGamesState by viewModel.newGames.collectAsState()
+    val recommendedGamesState by viewModel.recommendedGames.collectAsState()
 
     val primaryColor = Color(0xFF1E0E4f)
 
@@ -105,6 +107,19 @@ fun HomeScreen(
                 games = newGamesState,
                 onGameClicked = { gameId -> /* Acción de navegación */ }
             )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            SectionHeader(title = "Recommended For You")
+            LazyRow(
+                contentPadding = PaddingValues(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.padding(bottom = 16.dp)
+            ) {
+                items(recommendedGamesState, key = { it.id }) { game ->
+                    RecommendedGameCard(game = game, onGameClicked = { gameId -> /* ... */ })
+                }
+            }
         }
 
     }
@@ -376,6 +391,46 @@ fun AppBottomNavigationBar() {
                 onClick = { /* Navegar a Profile */ },
                 icon = { Icon(Icons.Filled.Person, contentDescription = "Profile") },
                 colors = NavigationBarItemDefaults.colors(indicatorColor = Color.Transparent)
+            )
+        }
+    }
+}
+
+@Composable
+fun RecommendedGameCard(game: Games, onGameClicked: (Int) -> Unit) {
+    val cardSize = 120.dp
+
+    Card(
+        shape = RoundedCornerShape(12.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF3B298E)),
+        modifier = Modifier
+            .size(cardSize)
+            .clickable { onGameClicked(game.id) }
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // Imagen (pequeña y cuadrada)
+            AsyncImage(
+                model = game.imageUrl ?: "https://pixelz.cc/wp-content/uploads/2018/06/street-fighter-v-uhd-4k-wallpaper.jpg",
+                contentDescription = game.title,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(cardSize * 0.7f)
+                    .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
+            )
+
+            // Título
+            Text(
+                text = game.title,
+                color = Color.White,
+                fontSize = 12.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.padding(top = 4.dp, start = 4.dp, end = 4.dp)
             )
         }
     }
