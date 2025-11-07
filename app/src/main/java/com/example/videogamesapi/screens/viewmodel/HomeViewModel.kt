@@ -25,11 +25,19 @@ class HomeViewModel(
         loadHomeData()
     }
 
+    private val _recommendedGames = MutableStateFlow<List<Games>>(emptyList())
+    val recommendedGames: StateFlow<List<Games>> = _recommendedGames
+
+    init {
+        loadHomeData()
+    }
+
     private fun loadHomeData(){
         viewModelScope.launch {
             _categories.value = repository.getCategories()
             _trendingGames.value = repository.getTrendingGames()
             _newGames.value = repository.getNewGames()
+            _recommendedGames.value = repository.getRecommendedGames()
         }
     }
 
@@ -39,4 +47,6 @@ class HomeViewModel(
         }
         _categories.value = updatedList
     }
+
+
 }
