@@ -2,6 +2,7 @@ package com.example.videogamesapi.data
 
 import com.example.videogamesapi.models.Category
 import com.example.videogamesapi.models.Games
+import com.example.videogamesapi.models.News
 
 class MyGamesRepository (){
     private val mockCategories = listOf(
@@ -30,6 +31,12 @@ class MyGamesRepository (){
         Games(303, "Red Dead Redemption 2", "Action - Adventure", "https://www.rockstargames.com/reddeadredemption2/assets/images/header-social.jpg"),
     )
 
+    private val mockNews = listOf(
+        News(401, "Rockstar anuncia retraso de GTA VI...", "Indigo Geek", "24 hours ago", "https://img.asmedia.epimg.net/resizer/v2/TJAZUKPIARGJXOVKEFQE5PY7UE.jpg?auth=258bf88218600c45691db3de88f8c2fbc7d9342b54cb9597d3fa34326e814e36&width=644&height=362&smart=true"),
+        News(402, "DLC gratias de Idle Champions of the... ", "EPIC GAMES STORE", "1 day ago", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRsScZ46tBWp6_2bOCH2LQ02fLBkISk8JXSbg&s"),
+        News(403, "Confirman nuevas Megaevoluciones...", "Nintenderos", "3 days ago", "https://objetos-xlk.estaticos-marca.com/uploads/2025/10/16/68f0aaa9ea889.jpeg"),
+    )
+
     fun getCategories(): List<Category> {
         return mockCategories
     }
@@ -44,6 +51,10 @@ class MyGamesRepository (){
 
     fun getRecommendedGames(): List<Games> {
         return mockRecommendedGames
+    }
+
+    fun getNews(): List<News> {
+        return mockNews
     }
 
 }
