@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -29,6 +30,7 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -56,6 +58,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
 import com.example.videogamesapi.models.Category
 import com.example.videogamesapi.models.Games
+import com.example.videogamesapi.models.News
 
 @Composable
 fun HomeScreen(
@@ -65,6 +68,7 @@ fun HomeScreen(
     val trendingGamesState by viewModel.trendingGames.collectAsState()
     val newGamesState by viewModel.newGames.collectAsState()
     val recommendedGamesState by viewModel.recommendedGames.collectAsState()
+    val news by viewModel.news.collectAsState()
 
     val primaryColor = Color(0xFF1E0E4f)
 
@@ -121,6 +125,21 @@ fun HomeScreen(
             ) {
                 items(recommendedGamesState, key = { it.id }) { game ->
                     RecommendedGameCard(game = game, onGameClicked = { gameId -> /* ... */ })
+                }
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            SectionHeader(title = "Latest Game News")
+
+            Column(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .padding(bottom = 16.dp) // Espacio adicional en la parte inferior
+            ) {
+                news.forEach { article ->
+                    NewsArticleItem(article = article, onArticleClicked = { articleId -> /* ... */ })
+                    Divider(color = Color.DarkGray, thickness = 0.5.dp)
                 }
             }
         }
@@ -439,8 +458,52 @@ fun RecommendedGameCard(game: Games, onGameClicked: (Int) -> Unit) {
     }
 }
 
+@Composable
+fun NewsArticleItem(article: News, onArticleClicked: (Int) -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = 90.dp)
+            .clickable { onArticleClicked(article.id) }
+            .padding(vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+
+        AsyncImage(
+            model = article.imageUrl ?: "https://img.asmedia.epimg.net/resizer/v2/TJAZUKPIARGJXOVKEFQE5PY7UE.jpg?auth=258bf88218600c45691db3de88f8c2fbc7d9342b54cb9597d3fa34326e814e36&width=644&height=362&smart=true",
+            contentDescription = article.title,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .size(70.dp)
+                .clip(RoundedCornerShape(8.dp))
+        )
+
+
+        Spacer(modifier = Modifier.width(12.dp))
+
+        Column(
+            modifier = Modifier.weight(1f)
+        ) {
+            Text(
+                text = article.title,
+                color = Color.White,
+                fontWeight = FontWeight.SemiBold,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = "${article.source} • ${article.timeAgo}",
+                color = Color.LightGray.copy(alpha = 0.7f),
+                fontSize = 12.sp,
+                maxLines = 1
+            )
+        }
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 fun HomeScreenPreview() {
-    HomeScreen() // no usar HomeViewModel() directamente aquí
+    HomeScreen()
 }
