@@ -21,16 +21,13 @@ class HomeViewModel(
     private val _newGames = MutableStateFlow<List<Games>>(emptyList())
     val newGames: MutableStateFlow<List<Games>> = _newGames
 
-    init {
-        loadHomeData()
-    }
-
     private val _recommendedGames = MutableStateFlow<List<Games>>(emptyList())
     val recommendedGames: StateFlow<List<Games>> = _recommendedGames
 
     init {
         loadHomeData()
     }
+
 
     private fun loadHomeData(){
         viewModelScope.launch {
