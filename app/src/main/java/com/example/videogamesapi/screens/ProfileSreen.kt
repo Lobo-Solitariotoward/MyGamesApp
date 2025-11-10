@@ -3,6 +3,8 @@ package com.example.videogamesapi.screens
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Notifications
@@ -10,11 +12,19 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil3.compose.rememberAsyncImagePainter
+import kotlin.math.max
 
 @Composable
 fun ProfileHeader() {
@@ -23,7 +33,10 @@ fun ProfileHeader() {
             .fillMaxSize()
             .background(Color(0xFF0C0F27))
     ) {
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            // Imagen superior
             Image(
                 painter = rememberAsyncImagePainter(
                     "https://img.goodfon.com/original/1920x1080/8/47/valorant-valorant-video-igry-takticheskii-shuter-riot-game-2.jpg"
@@ -35,6 +48,7 @@ fun ProfileHeader() {
                 contentScale = ContentScale.Crop
             )
 
+            // Iconos superiores
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -52,6 +66,74 @@ fun ProfileHeader() {
                     contentDescription = "Menú",
                     tint = Color.White
                 )
+            }
+
+            // Fondo inferior con degradado y panel redondeado
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .offset(y = 200.dp)
+                    .clip(RoundedCornerShape(topStart = 35.dp, topEnd = 35.dp))
+                    .drawBehind {
+                        val w = size.width
+                        val h = size.height
+                        val red = Color(0xFFA80C0D)
+
+                        // Fondo base gris oscuro
+                        drawRect(color = Color(0xFF443E3E))
+
+                        // Brillo rojo en esquinas inferiores
+                        val radius = max(w, h)
+                        val glowRadius = radius / 1.5f
+                        drawRect(
+                            brush = Brush.radialGradient(
+                                colors = listOf(red.copy(alpha = 0.45f), Color.Transparent),
+                                center = Offset(0f, h),
+                                radius = glowRadius
+                            )
+                        )
+                        drawRect(
+                            brush = Brush.radialGradient(
+                                colors = listOf(red.copy(alpha = 0.45f), Color.Transparent),
+                                center = Offset(w, h),
+                                radius = glowRadius
+                            )
+                        )
+                    }
+            ) {
+                // Contenido del perfil
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .padding(top = 30.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    // Imagen de perfil
+                    Image(
+                        painter = rememberAsyncImagePainter(
+                            "https://i.pinimg.com/736x/e1/c6/9a/e1c69a374f0888d55f1e307456c46ace.jpg"
+                        ),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(110.dp)
+                            .clip(CircleShape)
+                            .shadow(12.dp, CircleShape),
+                        contentScale = ContentScale.Crop
+                    )
+
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        text = "@cat11",
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp
+                    )
+                    Text(
+                        text = "New York, USA",
+                        color = Color(0xFFB0B0B0),
+                        fontSize = 13.sp
+                    )
+                }
             }
         }
     }
