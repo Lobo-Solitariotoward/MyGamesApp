@@ -84,6 +84,33 @@ fun TrendingScreen(onBackClick: (() -> Unit)? = null) {
                     modifier = Modifier.weight(1f)
                 )
             }
+
+            // 🎮 Sección de próximos lanzamientos
+            Text(
+                text = "🎮 Próximos Lanzamientos",
+                color = Color.White,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.padding(top = 10.dp)
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                SmallCard(
+                    imageUrl = "https://cloudfront-us-east-1.images.arcpublishing.com/infobae/K6TI7JSTVZC5JIU3YR37CCUOOI.jpg",
+                    title = "GTA VI",
+                    subtitle = "Rockstar anuncia retraso de GTA VI para pulir detalles finales.",
+                    modifier = Modifier.weight(1f)
+                )
+                SmallCard(
+                    imageUrl = "https://cdn2.unrealengine.com/fortnite-og-metaimage-1920x1080-1920x1080-c95ec08b27db.jpg",
+                    title = "Fortnite OG Regresa",
+                    subtitle = "Epic Games revive el mapa original con eventos y skins clásicos.",
+                    modifier = Modifier.weight(1f)
+                )
+            }
         }
 
         // 🔹 Menú inferior
@@ -131,11 +158,11 @@ fun SmallCard(
     imageUrl: String,
     title: String,
     subtitle: String,
-    modifier: Modifier = Modifier // ✅ recíbelo desde fuera
+    modifier: Modifier = Modifier
 ) {
     Card(
         modifier = modifier
-            .height(180.dp), // ✅ solo la altura aquí
+            .height(180.dp),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0xFF1E1B1B))
     ) {
