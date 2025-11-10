@@ -1,9 +1,12 @@
 package com.example.videogamesapi.screens
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -27,9 +30,35 @@ data class ChatMessage(
 
 @Composable
 fun ChatScreen() {
+    var message by remember { mutableStateOf("") }
+    val messages = remember {
+        mutableStateListOf(
+            ChatMessage("Queen", "More fun than I think any of us have had in a while.", false,
+                "https://i.pinimg.com/originals/5e/ca/27/5eca2762d126defa7680aff778bf1df2.jpg", true),
+            ChatMessage("UrNext", "Do you love me and how much?", true,
+                "https://i.pinimg.com/1200x/ee/20/b6/ee20b6fbb928e402b79601325dfcc6e9.jpg", true),
+            ChatMessage("Blank0", "HELLO YOUTUBE!!!!!!!!!! 😂", false,
+                "https://i.pinimg.com/originals/6f/77/45/6f7745a82ed8e158dc17e9253674180f.jpg", false),
+            ChatMessage("RaptorJesvs", "If I could go negative, I would. 😆", true,
+                "https://i.pinimg.com/736x/bb/d5/15/bbd51518913ec655716400d7e34b6a6a.jpg", true),
+            ChatMessage("winterhaven", "Depends on your rates. 😏", false,
+                "https://i.pinimg.com/originals/20/9f/b1/209fb11c88ca45d6e3f6a6a8c5494b23.jpg", true),
+            ChatMessage("Nova", "Can’t believe we’re still awake 😂", false,
+                "https://i.pinimg.com/originals/0d/2c/1d/0d2c1d49a44ab8aed3ebd6660402d5f2.jpg", true),
+            ChatMessage("UrNext", "We gamers never sleep 😎", true,
+                "https://i.pinimg.com/736x/90/f9/81/90f981806d0a349998e8eb4521ebf4a8.jpg", true),
+            ChatMessage("Blank0", "Stream’s starting soon!", false,
+                "https://i.pinimg.com/474x/04/69/45/04694507556179005024817ad3d40632.jpg", false),
+            ChatMessage("Queen", "Let’s gooo 🔥🔥🔥", false,
+                "https://i.pinimg.com/736x/d4/d1/41/d4d141e8bf4e8c2a773785b35ca1f8c1.jpg", true),
+            ChatMessage("RaptorJesvs", "GG everyone! 🎮", true,
+                "https://fiverr-res.cloudinary.com/images/t_main1,q_auto,f_auto,q_auto,f_auto/gigs/392177261/original/dc71edee38b6a6ae07992b6bc1d01e25def7b7a3/draw-pfp-avatar-icon-album-cover-portrait-of-your-oc-vtuber-anime-character.png", true)
+        )
+    }
+
     Column(modifier = Modifier.fillMaxSize()) {
-        // Fondo con imagen y oscurecimiento
         Box {
+            // Fondo con imagen y gradiente
             Image(
                 painter = rememberAsyncImagePainter(
                     "https://www.xtrafondos.com/wallpapers/vertical/chica-anime-en-paisaje-3730.jpg"
@@ -38,7 +67,6 @@ fun ChatScreen() {
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop
             )
-
             Box(
                 modifier = Modifier
                     .matchParentSize()
@@ -49,8 +77,8 @@ fun ChatScreen() {
                     )
             )
 
-            // Encabezado del chat
             Column(modifier = Modifier.fillMaxSize()) {
+                // Header
                 Text(
                     text = "Community Chat 💬",
                     color = Color.White,
@@ -60,6 +88,26 @@ fun ChatScreen() {
                         .padding(16.dp)
                         .align(Alignment.CenterHorizontally)
                 )
+
+                // Lista de mensajes
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .verticalScroll(rememberScrollState())
+                        .padding(horizontal = 10.dp, vertical = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    messages.forEach { msg ->
+                        AnimatedVisibility(visible = true) {
+                            // Aquí se mostrará cada burbuja (se implementará en la siguiente parte)
+                            Text(
+                                text = msg.text,
+                                color = Color.White,
+                                modifier = Modifier.padding(4.dp)
+                            )
+                        }
+                    }
+                }
             }
         }
     }
