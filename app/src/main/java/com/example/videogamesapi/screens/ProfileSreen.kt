@@ -101,7 +101,6 @@ fun ProfileHeader() {
                         )
                     }
             ) {
-                // Contenido del perfil
                 Column(
                     modifier = Modifier
                         .align(Alignment.TopCenter)
@@ -122,17 +121,8 @@ fun ProfileHeader() {
                     )
 
                     Spacer(Modifier.height(8.dp))
-                    Text(
-                        text = "@cat11",
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 18.sp
-                    )
-                    Text(
-                        text = "New York, USA",
-                        color = Color(0xFFB0B0B0),
-                        fontSize = 13.sp
-                    )
+                    Text("@cat11", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                    Text("New York, USA", color = Color(0xFFB0B0B0), fontSize = 13.sp)
 
                     Spacer(Modifier.height(16.dp))
 
@@ -148,7 +138,7 @@ fun ProfileHeader() {
 
                     Spacer(Modifier.height(24.dp))
 
-                    // Tarjeta de estadísticas
+                    // Estadísticas
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -179,7 +169,7 @@ fun ProfileHeader() {
 
                     Spacer(Modifier.height(24.dp))
 
-                    // 🔹 Nueva sección: Recent Streams
+                    // Sección: Recent Streams
                     Text(
                         text = "Recent Streams",
                         color = Color.White,
@@ -209,9 +199,142 @@ fun ProfileHeader() {
                             "https://cdn.mos.cms.futurecdn.net/DY24625s6z9gdNu7DEdr8H.jpg"
                         )
                     }
+
+                    Spacer(Modifier.height(30.dp))
+
+                    // 🔹 Nueva sección: Connected Friends
+                    Text(
+                        text = "Connected Friends",
+                        color = Color.White,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier
+                            .align(Alignment.Start)
+                            .padding(start = 25.dp, bottom = 10.dp)
+                    )
+
+                    Row(
+                        modifier = Modifier
+                            .horizontalScroll(rememberScrollState())
+                            .padding(start = 12.dp, bottom = 80.dp),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        FriendCard(
+                            "Jett",
+                            "https://i.ytimg.com/vi/zqkJ30O3CjU/maxresdefault.jpg",
+                            "https://wallpapers.com/images/hd/gaming-profile-pictures-p2viuapqmpk5gvv5.jpg"
+                        )
+                        FriendCard(
+                            "Sage",
+                            "https://images.squarespace-cdn.com/content/v1/60c7ba0eb2862230f13fb3e1/39030884-1f6d-4d03-80f9-a2f07d9b86ef/Key+Art+2.png",
+                            "https://i.etsystatic.com/41321847/r/il/b4803d/7025708203/il_fullxfull.7025708203_bu6p.jpg"
+                        )
+                        FriendCard(
+                            "Phoenix",
+                            "https://s1.pearlcdn.com/NAEU/Upload/thumbnail/2024/9IP46AAV0G16I0LF20240605092513052.923x522.jpg",
+                            "https://i.pravatar.cc/150?img=68"
+                        )
+                    }
                 }
             }
         }
+    }
+}
+
+@Composable
+fun FriendCard(username: String, gameBg: String, profilePic: String) {
+    Box(
+        modifier = Modifier
+            .width(210.dp)
+            .height(130.dp)
+            .clip(RoundedCornerShape(16.dp))
+            .background(Color(0xFF2C2C2C))
+    ) {
+        Image(
+            painter = rememberAsyncImagePainter(gameBg),
+            contentDescription = null,
+            modifier = Modifier.matchParentSize(),
+            contentScale = ContentScale.Crop
+        )
+
+        Box(
+            modifier = Modifier
+                .matchParentSize()
+                .background(Color(0x55000000))
+        )
+
+        Row(
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .padding(10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box {
+                Image(
+                    painter = rememberAsyncImagePainter(profilePic),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(42.dp)
+                        .clip(CircleShape)
+                        .shadow(5.dp, CircleShape),
+                    contentScale = ContentScale.Crop
+                )
+
+                Box(
+                    modifier = Modifier
+                        .size(12.dp)
+                        .background(Color(0xFF4CAF50), CircleShape)
+                        .align(Alignment.BottomEnd)
+                        .offset(x = 3.dp, y = 3.dp)
+                )
+            }
+
+            Spacer(Modifier.width(10.dp))
+
+            Column {
+                Text(username, color = Color.White, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
+                Text("Online", color = Color(0xFF8BC34A), fontSize = 12.sp)
+            }
+        }
+    }
+}
+
+@Composable
+fun StreamCard(title: String, imageUrl: String) {
+    Box(
+        modifier = Modifier
+            .width(210.dp)
+            .height(130.dp)
+            .clip(RoundedCornerShape(16.dp))
+    ) {
+        Image(
+            painter = rememberAsyncImagePainter(imageUrl),
+            contentDescription = null,
+            modifier = Modifier.matchParentSize(),
+            contentScale = ContentScale.Crop
+        )
+        Box(
+            Modifier
+                .align(Alignment.BottomStart)
+                .fillMaxWidth()
+                .height(55.dp)
+                .background(
+                    Brush.verticalGradient(
+                        listOf(Color.Transparent, Color(0xAA000000))
+                    )
+                )
+        )
+        Text(
+            text = title,
+            color = Color.White,
+            fontSize = 13.sp,
+            fontWeight = FontWeight.Medium,
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .padding(10.dp),
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis
+        )
     }
 }
 
@@ -232,49 +355,6 @@ fun StatItem(label: String, value: String) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(value, color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
         Text(label, color = Color(0xFFB0B0B0), fontSize = 12.sp)
-    }
-}
-
-@Composable
-fun StreamCard(title: String, imageUrl: String) {
-    Box(
-        modifier = Modifier
-            .width(210.dp)
-            .height(130.dp)
-            .clip(RoundedCornerShape(16.dp))
-    ) {
-        Image(
-            painter = rememberAsyncImagePainter(imageUrl),
-            contentDescription = null,
-            modifier = Modifier.matchParentSize(),
-            contentScale = ContentScale.Crop
-        )
-
-        // Degradado inferior para contraste del texto
-        Box(
-            Modifier
-                .align(Alignment.BottomStart)
-                .fillMaxWidth()
-                .height(55.dp)
-                .background(
-                    Brush.verticalGradient(
-                        listOf(Color.Transparent, Color(0xAA000000))
-                    )
-                )
-        )
-
-        // Título del stream
-        Text(
-            text = title,
-            color = Color.White,
-            fontSize = 13.sp,
-            fontWeight = FontWeight.Medium,
-            modifier = Modifier
-                .align(Alignment.BottomStart)
-                .padding(10.dp),
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis
-        )
     }
 }
 
