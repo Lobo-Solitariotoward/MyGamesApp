@@ -27,11 +27,7 @@ fun TrendingScreen(onBackClick: (() -> Unit)? = null) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    listOf(Color(0xFF0C0F27), Color(0xFF1A182E))
-                )
-            )
+            .background(Color(0xFF1E0E4f))
     ) {
         // Header con botón de regreso y título centrado
         Box(
