@@ -5,12 +5,15 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -58,7 +61,7 @@ fun ChatScreen() {
 
     Column(modifier = Modifier.fillMaxSize()) {
         Box {
-            // Fondo con imagen y gradiente
+            // Fondo con imagen
             Image(
                 painter = rememberAsyncImagePainter(
                     "https://www.xtrafondos.com/wallpapers/vertical/chica-anime-en-paisaje-3730.jpg"
@@ -67,6 +70,7 @@ fun ChatScreen() {
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop
             )
+            // Gradiente oscuro inferior
             Box(
                 modifier = Modifier
                     .matchParentSize()
@@ -99,16 +103,74 @@ fun ChatScreen() {
                 ) {
                     messages.forEach { msg ->
                         AnimatedVisibility(visible = true) {
-                            // Aquí se mostrará cada burbuja (se implementará en la siguiente parte)
-                            Text(
-                                text = msg.text,
-                                color = Color.White,
-                                modifier = Modifier.padding(4.dp)
-                            )
+                            MessageBubble(msg)
                         }
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun MessageBubble(msg: ChatMessage) {
+    val bubbleColor = if (msg.isMine)
+        Brush.verticalGradient(listOf(Color(0xFF7A6BFF), Color(0xFF5A50E8)))
+    else
+        Brush.verticalGradient(listOf(Color(0xFF3A3A3A), Color(0xFF2B2B2B)))
+
+    val alignment = if (msg.isMine) Alignment.End else Alignment.Start
+
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = alignment
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            if (!msg.isMine) UserAvatar(msg)
+
+            Column(horizontalAlignment = alignment) {
+                Text(
+                    text = msg.username,
+                    color = Color(0xFFB0B0B0),
+                    fontSize = 12.sp,
+                    modifier = Modifier.padding(start = 4.dp)
+                )
+                Box(
+                    modifier = Modifier
+                        .shadow(4.dp, RoundedCornerShape(20.dp))
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(bubbleColor)
+                        .padding(horizontal = 14.dp, vertical = 10.dp)
+                ) {
+                    Text(msg.text, color = Color.White, fontSize = 15.sp)
+                }
+            }
+
+            if (msg.isMine) UserAvatar(msg)
+        }
+    }
+}
+
+@Composable
+fun UserAvatar(msg: ChatMessage) {
+    Box {
+        Image(
+            painter = rememberAsyncImagePainter(msg.profileUrl),
+            contentDescription = msg.username,
+            modifier = Modifier
+                .size(38.dp)
+                .clip(CircleShape)
+        )
+        if (msg.isOnline) {
+            Box(
+                modifier = Modifier
+                    .size(10.dp)
+                    .background(Color(0xFF4CAF50), CircleShape)
+                    .align(Alignment.BottomEnd)
+            )
         }
     }
 }
