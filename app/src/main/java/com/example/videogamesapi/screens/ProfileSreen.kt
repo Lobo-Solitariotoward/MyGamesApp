@@ -2,7 +2,9 @@ package com.example.videogamesapi.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -79,10 +81,7 @@ fun ProfileHeader() {
                         val h = size.height
                         val red = Color(0xFFA80C0D)
 
-                        // Fondo base gris oscuro
                         drawRect(color = Color(0xFF443E3E))
-
-                        // Brillo rojo en esquinas inferiores
                         val radius = max(w, h)
                         val glowRadius = radius / 1.5f
                         drawRect(
@@ -133,9 +132,34 @@ fun ProfileHeader() {
                         color = Color(0xFFB0B0B0),
                         fontSize = 13.sp
                     )
+
+                    Spacer(Modifier.height(16.dp))
+
+                    // Chips de juegos
+                    Row(
+                        modifier = Modifier
+                            .horizontalScroll(rememberScrollState()),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        GameChip("Valorant", Color(0xFFA80C0D))
+                        GameChip("Call Of Duty", Color(0xFF4A90E2))
+                        GameChip("Apex", Color(0xFFE5C100), Color(0xFF1C1C1C))
+                    }
                 }
             }
         }
+    }
+}
+
+@Composable
+fun GameChip(text: String, background: Color, textColor: Color = Color.White) {
+    Box(
+        modifier = Modifier
+            .clip(RoundedCornerShape(20.dp))
+            .background(background.copy(alpha = 0.85f))
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+    ) {
+        Text(text, color = textColor, fontWeight = FontWeight.Medium, fontSize = 12.sp)
     }
 }
 
