@@ -25,6 +25,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChatBubble
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.LocalFireDepartment
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Videocam
@@ -379,7 +380,6 @@ fun AppBottomNavigationBar() {
                 .fillMaxWidth()
                 .height(64.dp)
         ) {
-            // Ítems de navegación (Home, Search, Camera, Chat, Profile)
             NavigationBarItem(
                 selected = true,
                 onClick = { /* Navegar a Home */ },
@@ -399,7 +399,7 @@ fun AppBottomNavigationBar() {
             NavigationBarItem(
                 selected = false,
                 onClick = { /* Navegar a Camera */ },
-                icon = { Icon(Icons.Filled.Videocam, contentDescription = "Camera") },
+                icon = { Icon(Icons.Default.LocalFireDepartment, contentDescription = "Camera") },
                 colors = NavigationBarItemDefaults.colors(indicatorColor = Color.Transparent)
             )
             NavigationBarItem(
