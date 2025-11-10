@@ -7,7 +7,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -17,6 +20,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -105,6 +109,47 @@ fun ChatScreen() {
                         AnimatedVisibility(visible = true) {
                             MessageBubble(msg)
                         }
+                    }
+                }
+
+                // Barra inferior para escribir mensaje
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp)
+                        .background(Color(0xFF2D2929), RoundedCornerShape(25.dp))
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    BasicTextField(
+                        value = message,
+                        onValueChange = { message = it },
+                        singleLine = true,
+                        textStyle = TextStyle(color = Color.White, fontSize = 16.sp),
+                        modifier = Modifier.weight(1f),
+                        decorationBox = { innerTextField ->
+                            if (message.isEmpty()) {
+                                Text("Type your message...", color = Color.Gray, fontSize = 15.sp)
+                            }
+                            innerTextField()
+                        }
+                    )
+
+                    IconButton(onClick = {
+                        if (message.isNotBlank()) {
+                            messages.add(
+                                ChatMessage(
+                                    "Me",
+                                    message,
+                                    true,
+                                    "https://i.pravatar.cc/150?img=47",
+                                    true
+                                )
+                            )
+                            message = ""
+                        }
+                    }) {
+                        Icon(Icons.Default.Send, contentDescription = "Send", tint = Color(0xFF7A6BFF))
                     }
                 }
             }
