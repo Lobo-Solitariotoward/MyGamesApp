@@ -26,9 +26,9 @@ class MyGamesRepository (){
     )
 
     private val mockRecommendedGames = listOf(
-        Games(301, "God of War Ragnarok", "Action - Adventure", "https://as01.epimg.net/meristation/imagenes/2022/11/09/noticias/1668002063_051408_1668002131_noticia_normal.jpg"),
-        Games(302, "Cyberpunk 2077", "RPG - Action", "https://cdn1.epicgames.com/salesEvent/salesEvent/EGS_Cyberpunk2077_CDProjektRed_S2_1200x1600-4f8f0f4f5e4f4e1f3e6e3b3c6e2e1f3d?h=854&resize=1&w=640"),
-        Games(303, "Red Dead Redemption 2", "Action - Adventure", "https://www.rockstargames.com/reddeadredemption2/assets/images/header-social.jpg"),
+        Games(301, "God of War Ragnarok", "Action - Adventure", "https://i.blogs.es/eadb27/1366_2000/1200_630.jpeg"),
+        Games(302, "Cyberpunk 2077", "RPG - Action", "https://cdn1.epicgames.com/offer/77f2b98e2cef40c8a7437518bf420e47/EGS_Cyberpunk2077_CDPROJEKTRED_S1_03_2560x1440-359e77d3cd0a40aebf3bbc130d14c5c7"),
+        Games(303, "Red Dead Redemption 2", "Action - Adventure", "https://media-rockstargames-com.akamaized.net/mfe6/prod/__common/img/949e0a50124a889b098f73cedc29fb3b.jpg"),
     )
 
     private val mockNews = listOf(
