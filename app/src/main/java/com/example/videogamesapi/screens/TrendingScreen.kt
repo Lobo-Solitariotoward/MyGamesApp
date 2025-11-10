@@ -65,6 +65,25 @@ fun TrendingScreen(onBackClick: (() -> Unit)? = null) {
                 title = "Elden Ring: Shadow of the Erdtree",
                 description = "El DLC más esperado del año ya está disponible. Los jugadores están maravillados por su mundo y dificultad épica."
             )
+
+            // 🧩 Fila con dos noticias secundarias
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                SmallCard(
+                    imageUrl = "https://cdn.sanity.io/images/dsfx7636/news_live/bb4f11049e5275ce32aa280ee2b1ef22398d3257-1920x1080.jpg",
+                    title = "Valorant Masters Madrid",
+                    subtitle = "FNATIC logra una victoria histórica en una final de infarto.",
+                    modifier = Modifier.weight(1f)
+                )
+                SmallCard(
+                    imageUrl = "https://cdn.cloudflare.steamstatic.com/steam/apps/990080/capsule_616x353.jpg",
+                    title = "Hogwarts Legacy Update",
+                    subtitle = "El parche mejora el rendimiento y agrega nuevos desafíos mágicos.",
+                    modifier = Modifier.weight(1f)
+                )
+            }
         }
 
         // 🔹 Menú inferior
@@ -72,7 +91,7 @@ fun TrendingScreen(onBackClick: (() -> Unit)? = null) {
     }
 }
 
-// 🔹 Tarjeta destacada principal
+// 🔹 Tarjeta destacada
 @Composable
 fun HighlightCard(imageUrl: String, title: String, description: String) {
     Card(
@@ -101,6 +120,38 @@ fun HighlightCard(imageUrl: String, title: String, description: String) {
             ) {
                 Text(title, color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
                 Text(description, color = Color(0xFFB0B0B0), fontSize = 14.sp)
+            }
+        }
+    }
+}
+
+// 🔹 Tarjeta secundaria (noticia pequeña)
+@Composable
+fun SmallCard(
+    imageUrl: String,
+    title: String,
+    subtitle: String,
+    modifier: Modifier = Modifier // ✅ recíbelo desde fuera
+) {
+    Card(
+        modifier = modifier
+            .height(180.dp), // ✅ solo la altura aquí
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF1E1B1B))
+    ) {
+        Column {
+            Image(
+                painter = rememberAsyncImagePainter(imageUrl),
+                contentDescription = title,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(100.dp)
+                    .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)),
+                contentScale = ContentScale.Crop
+            )
+            Column(modifier = Modifier.padding(12.dp)) {
+                Text(title, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                Text(subtitle, color = Color(0xFFB0B0B0), fontSize = 12.sp)
             }
         }
     }
