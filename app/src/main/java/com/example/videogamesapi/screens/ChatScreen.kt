@@ -12,6 +12,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -37,8 +38,9 @@ data class ChatMessage(
     val isOnline: Boolean
 )
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ChatScreen() {
+fun ChatScreen(onBackClick: (() -> Unit)? = null) {
     var message by remember { mutableStateOf("") }
     val messages = remember {
         mutableStateListOf(
@@ -52,7 +54,7 @@ fun ChatScreen() {
                 "https://i.pinimg.com/736x/bb/d5/15/bbd51518913ec655716400d7e34b6a6a.jpg", true),
             ChatMessage("winterhaven", "Ufotable se volvió a pasar, esos efectos del castillo moviéndose son arte puro.", false,
                 "https://i.pinimg.com/originals/20/9f/b1/209fb11c88ca45d6e3f6a6a8c5494b23.jpg", true),
-            ChatMessage("Nova", "La música me puso la piel chinita, sobre todo cuando entra la flauta de Tanjiro 😭", false,
+            ChatMessage("Nova", "La música me puso la piel chinita, sobre todo con la canción del final 😭", false,
                 "https://i.pinimg.com/originals/0d/2c/1d/0d2c1d49a44ab8aed3ebd6660402d5f2.jpg", true),
             ChatMessage("UrNext", "Literal, no hay estudio que iguale esa calidad. Es como ver pintura en movimiento.", true,
                 "https://i.pinimg.com/736x/90/f9/81/90f981806d0a349998e8eb4521ebf4a8.jpg", true),
@@ -63,100 +65,126 @@ fun ChatScreen() {
         )
     }
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        Box {
-            Image(
-                painter = rememberAsyncImagePainter(
-                    "https://www.xtrafondos.com/wallpapers/vertical/chica-anime-en-paisaje-3730.jpg"
-                ),
-                contentDescription = null,
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop
-            )
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFF0C0F27))
+    ) {
+        // 🔹 Fondo principal con imagen
+        Image(
+            painter = rememberAsyncImagePainter(
+                "https://www.xtrafondos.com/wallpapers/vertical/chica-anime-en-paisaje-3730.jpg"
+            ),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
 
+        // 🔹 Degradado sutil encima del fondo
+        Box(
+            modifier = Modifier
+                .matchParentSize()
+                .background(
+                    Brush.verticalGradient(
+                        listOf(Color(0xAA000000), Color(0x99000000))
+                    )
+                )
+        )
+
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            // 🔹 Header transparente con botón a la izquierda y título centrado
             Box(
                 modifier = Modifier
-                    .matchParentSize()
-                    .background(
-                        Brush.verticalGradient(
-                            listOf(Color(0xAA000000), Color(0x99000000))
-                        )
+                    .fillMaxWidth()
+                    .padding(horizontal = 10.dp, vertical = 14.dp),
+            ) {
+                IconButton(
+                    onClick = { onBackClick?.invoke() },
+                    modifier = Modifier.align(Alignment.CenterStart)
+                ) {
+                    Icon(
+                        Icons.Default.ArrowBack,
+                        contentDescription = "Back",
+                        tint = Color.White
                     )
-            )
-
-            Column(modifier = Modifier.fillMaxSize()) {
+                }
                 Text(
                     text = "Community Chat 💬",
                     color = Color.White,
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .align(Alignment.CenterHorizontally)
+                    modifier = Modifier.align(Alignment.Center)
                 )
+            }
 
-                Column(
-                    modifier = Modifier
-                        .weight(1f)
-                        .verticalScroll(rememberScrollState())
-                        .padding(horizontal = 10.dp, vertical = 8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    messages.forEach { msg ->
-                        AnimatedVisibility(
-                            visible = true,
-                            enter = fadeIn(animationSpec = tween(400))
-                        ) {
-                            MessageBubble(msg)
-                        }
-                    }
-                }
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(12.dp)
-                        .background(Color(0xFF1E1B1B), RoundedCornerShape(30.dp))
-                        .padding(horizontal = 16.dp, vertical = 10.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    BasicTextField(
-                        value = message,
-                        onValueChange = { message = it },
-                        singleLine = true,
-                        textStyle = TextStyle(color = Color.White, fontSize = 16.sp),
-                        modifier = Modifier.weight(1f),
-                        decorationBox = { innerTextField ->
-                            if (message.isEmpty()) {
-                                Text("Escribe tu mensaje...", color = Color.Gray, fontSize = 15.sp)
-                            }
-                            innerTextField()
-                        }
-                    )
-
-                    IconButton(onClick = {
-                        if (message.isNotBlank()) {
-                            messages.add(
-                                ChatMessage(
-                                    "♡ Denji y Rezeㅤ♡",
-                                    message,
-                                    true,
-                                    "https://fiverr-res.cloudinary.com/images/t_main1,q_auto,f_auto,q_auto,f_auto/gigs/392177261/original/dc71edee38b6a6ae07992b6bc1d01e25def7b7a3/draw-pfp-avatar-icon-album-cover-portrait-of-your-oc-vtuber-anime-character.png",
-                                    true
-                                )
-                            )
-                            message = ""
-                        }
-                    }) {
-                        Icon(
-                            Icons.Default.Send,
-                            contentDescription = "Send",
-                            tint = Color(0xFF7A6BFF),
-                            modifier = Modifier.size(26.dp)
-                        )
+            // 🔹 Contenedor de mensajes
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 10.dp, vertical = 12.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                messages.forEach { msg ->
+                    AnimatedVisibility(
+                        visible = true,
+                        enter = fadeIn(animationSpec = tween(400))
+                    ) {
+                        MessageBubble(msg)
                     }
                 }
             }
+
+            // 🔹 Campo para escribir
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(12.dp)
+                    .background(Color(0xFF1E1B1B), RoundedCornerShape(30.dp))
+                    .padding(horizontal = 16.dp, vertical = 10.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                BasicTextField(
+                    value = message,
+                    onValueChange = { message = it },
+                    singleLine = true,
+                    textStyle = TextStyle(color = Color.White, fontSize = 16.sp),
+                    modifier = Modifier.weight(1f),
+                    decorationBox = { innerTextField ->
+                        if (message.isEmpty()) {
+                            Text("Escribe tu mensaje...", color = Color.Gray, fontSize = 15.sp)
+                        }
+                        innerTextField()
+                    }
+                )
+
+                IconButton(onClick = {
+                    if (message.isNotBlank()) {
+                        messages.add(
+                            ChatMessage(
+                                "♡ Denji y Reze ♡",
+                                message,
+                                true,
+                                "https://fiverr-res.cloudinary.com/images/t_main1,q_auto,f_auto,q_auto,f_auto/gigs/392177261/original/dc71edee38b6a6ae07992b6bc1d01e25def7b7a3/draw-pfp-avatar-icon-album-cover-portrait-of-your-oc-vtuber-anime-character.png",
+                                true
+                            )
+                        )
+                        message = ""
+                    }
+                }) {
+                    Icon(
+                        Icons.Default.Send,
+                        contentDescription = "Send",
+                        tint = Color(0xFF7A6BFF),
+                        modifier = Modifier.size(26.dp)
+                    )
+                }
+            }
+
+            // 🔹 Barra inferior de navegación (opcional)
+            BottomMenu(selectedItem = "Chat")
         }
     }
 }
