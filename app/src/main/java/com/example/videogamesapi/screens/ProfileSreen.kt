@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.rememberAsyncImagePainter
 import kotlin.math.max
 
-// 🔹 Estructura principal con menú inferior
+// Estructura principal con menú inferior
 @Composable
 fun ProfileHeader() {
     Column(
@@ -203,7 +203,7 @@ fun ProfileContent() {
 
                 Spacer(Modifier.height(30.dp))
 
-                // 🏆 Recompensas o Logros
+                // Recompensas o Logros
                 SectionTitle("Rewards & Achievements")
                 Row(
                     modifier = Modifier
@@ -221,7 +221,7 @@ fun ProfileContent() {
     }
 }
 
-// 🔹 RewardCard Composable
+// RewardCard Composable
 @Composable
 fun RewardCard(title: String, imageUrl: String) {
     Box(
@@ -254,7 +254,7 @@ fun RewardCard(title: String, imageUrl: String) {
     }
 }
 
-// 🔹 Barra inferior
+// Barra inferior
 @Composable
 fun BottomMenu(selectedItem: String = "Profile") {
     val items = listOf("Home", "Search", "Trending", "Chat", "Profile")
@@ -310,7 +310,7 @@ fun BottomMenu(selectedItem: String = "Profile") {
     }
 }
 
-// 🔹 Reutilizables
+// Reutilizables
 @Composable
 fun GameChip(text: String, background: Color, textColor: Color = Color.White) {
     Box(
