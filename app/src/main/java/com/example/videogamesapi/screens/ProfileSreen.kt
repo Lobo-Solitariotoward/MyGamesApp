@@ -7,10 +7,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -137,13 +137,43 @@ fun ProfileHeader() {
 
                     // Chips de juegos
                     Row(
-                        modifier = Modifier
-                            .horizontalScroll(rememberScrollState()),
+                        modifier = Modifier.horizontalScroll(rememberScrollState()),
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         GameChip("Valorant", Color(0xFFA80C0D))
                         GameChip("Call Of Duty", Color(0xFF4A90E2))
                         GameChip("Apex", Color(0xFFE5C100), Color(0xFF1C1C1C))
+                    }
+
+                    Spacer(Modifier.height(24.dp))
+
+                    // Tarjeta de estadísticas
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 20.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color(0x331C1C1C)),
+                        shape = RoundedCornerShape(20.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 16.dp),
+                            horizontalArrangement = Arrangement.SpaceEvenly,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            StatItem("Posts", "1K")
+                            VerticalDivider(
+                                modifier = Modifier.height(35.dp).width(1.dp),
+                                color = Color(0x66FFFFFF)
+                            )
+                            StatItem("Followers", "420K")
+                            VerticalDivider(
+                                modifier = Modifier.height(35.dp).width(1.dp),
+                                color = Color(0x66FFFFFF)
+                            )
+                            StatItem("Following", "95")
+                        }
                     }
                 }
             }
@@ -160,6 +190,14 @@ fun GameChip(text: String, background: Color, textColor: Color = Color.White) {
             .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
         Text(text, color = textColor, fontWeight = FontWeight.Medium, fontSize = 12.sp)
+    }
+}
+
+@Composable
+fun StatItem(label: String, value: String) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(value, color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+        Text(label, color = Color(0xFFB0B0B0), fontSize = 12.sp)
     }
 }
 
