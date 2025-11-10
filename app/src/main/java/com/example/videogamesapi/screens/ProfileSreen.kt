@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -175,6 +176,39 @@ fun ProfileHeader() {
                             StatItem("Following", "95")
                         }
                     }
+
+                    Spacer(Modifier.height(24.dp))
+
+                    // 🔹 Nueva sección: Recent Streams
+                    Text(
+                        text = "Recent Streams",
+                        color = Color.White,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier
+                            .align(Alignment.Start)
+                            .padding(start = 25.dp, bottom = 10.dp)
+                    )
+
+                    Row(
+                        modifier = Modifier
+                            .horizontalScroll(rememberScrollState())
+                            .padding(start = 12.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        StreamCard(
+                            "Valorant Ranked With New Tenz Mouse :)",
+                            "https://mir-s3-cdn-cf.behance.net/project_modules/1400/ff3883118217021.6084f69f22ab5.png"
+                        )
+                        StreamCard(
+                            "Let's Hangout — APEX Warm-up",
+                            "https://www.zerging.net/wp-content/uploads/2019/05/Zerging-Overlay-Apex-Legends-Preview.jpg"
+                        )
+                        StreamCard(
+                            "Call of Duty: Ranked Highlights",
+                            "https://cdn.mos.cms.futurecdn.net/DY24625s6z9gdNu7DEdr8H.jpg"
+                        )
+                    }
                 }
             }
         }
@@ -198,6 +232,49 @@ fun StatItem(label: String, value: String) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(value, color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
         Text(label, color = Color(0xFFB0B0B0), fontSize = 12.sp)
+    }
+}
+
+@Composable
+fun StreamCard(title: String, imageUrl: String) {
+    Box(
+        modifier = Modifier
+            .width(210.dp)
+            .height(130.dp)
+            .clip(RoundedCornerShape(16.dp))
+    ) {
+        Image(
+            painter = rememberAsyncImagePainter(imageUrl),
+            contentDescription = null,
+            modifier = Modifier.matchParentSize(),
+            contentScale = ContentScale.Crop
+        )
+
+        // Degradado inferior para contraste del texto
+        Box(
+            Modifier
+                .align(Alignment.BottomStart)
+                .fillMaxWidth()
+                .height(55.dp)
+                .background(
+                    Brush.verticalGradient(
+                        listOf(Color.Transparent, Color(0xAA000000))
+                    )
+                )
+        )
+
+        // Título del stream
+        Text(
+            text = title,
+            color = Color.White,
+            fontSize = 13.sp,
+            fontWeight = FontWeight.Medium,
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .padding(10.dp),
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis
+        )
     }
 }
 
