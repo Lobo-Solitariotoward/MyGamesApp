@@ -1,6 +1,8 @@
 package com.example.videogamesapi.screens
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -74,13 +76,14 @@ fun ChatScreen() {
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop
             )
-            // Gradiente oscuro inferior
+
+            // Gradiente oscuro superior e inferior
             Box(
                 modifier = Modifier
                     .matchParentSize()
                     .background(
                         Brush.verticalGradient(
-                            listOf(Color(0x66000000), Color(0xCC000000))
+                            listOf(Color(0xAA000000), Color(0x99000000))
                         )
                     )
             )
@@ -106,19 +109,22 @@ fun ChatScreen() {
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     messages.forEach { msg ->
-                        AnimatedVisibility(visible = true) {
+                        AnimatedVisibility(
+                            visible = true,
+                            enter = fadeIn(animationSpec = tween(400))
+                        ) {
                             MessageBubble(msg)
                         }
                     }
                 }
 
-                // Barra inferior para escribir mensaje
+                // Barra inferior
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(10.dp)
-                        .background(Color(0xFF2D2929), RoundedCornerShape(25.dp))
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                        .padding(12.dp)
+                        .background(Color(0xFF1E1B1B), RoundedCornerShape(30.dp))
+                        .padding(horizontal = 16.dp, vertical = 10.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     BasicTextField(
@@ -149,7 +155,12 @@ fun ChatScreen() {
                             message = ""
                         }
                     }) {
-                        Icon(Icons.Default.Send, contentDescription = "Send", tint = Color(0xFF7A6BFF))
+                        Icon(
+                            Icons.Default.Send,
+                            contentDescription = "Send",
+                            tint = Color(0xFF7A6BFF),
+                            modifier = Modifier.size(26.dp)
+                        )
                     }
                 }
             }
@@ -185,8 +196,8 @@ fun MessageBubble(msg: ChatMessage) {
                 )
                 Box(
                     modifier = Modifier
-                        .shadow(4.dp, RoundedCornerShape(20.dp))
-                        .clip(RoundedCornerShape(20.dp))
+                        .shadow(5.dp, RoundedCornerShape(25.dp))
+                        .clip(RoundedCornerShape(25.dp))
                         .background(bubbleColor)
                         .padding(horizontal = 14.dp, vertical = 10.dp)
                 ) {
@@ -206,13 +217,13 @@ fun UserAvatar(msg: ChatMessage) {
             painter = rememberAsyncImagePainter(msg.profileUrl),
             contentDescription = msg.username,
             modifier = Modifier
-                .size(38.dp)
+                .size(40.dp)
                 .clip(CircleShape)
         )
         if (msg.isOnline) {
             Box(
                 modifier = Modifier
-                    .size(10.dp)
+                    .size(11.dp)
                     .background(Color(0xFF4CAF50), CircleShape)
                     .align(Alignment.BottomEnd)
             )
