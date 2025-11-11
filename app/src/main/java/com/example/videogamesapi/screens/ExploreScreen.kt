@@ -127,4 +127,53 @@ private fun SectionHeader(
     }
 }
 
+@Composable
+private fun BannerRow(items: List<Game>) {
+    LazyRow(
+        contentPadding = PaddingValues(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        items(items) { game ->
+            BannerCard(game)
+        }
+    }
+    Spacer(Modifier.height(8.dp))
+}
 
+@Composable
+private fun BannerCard(game: Game) {
+    val shape = MaterialTheme.shapes.medium
+    Column(
+        modifier = Modifier
+            .width(280.dp)
+            .clip(shape)
+    ) {
+        AsyncImage(
+            model = game.imageUrl,
+            contentDescription = game.title,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(140.dp)
+                .clip(shape),
+            contentScale = ContentScale.Crop
+        )
+        Spacer(Modifier.height(8.dp))
+        Text(
+            text = game.title,
+            modifier = Modifier.padding(horizontal = 4.dp),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            fontWeight = FontWeight.SemiBold,
+            color = OnBg
+        )
+        Text(
+            text = game.subtitle,
+            modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            color = Muted,
+            fontSize = 12.sp
+        )
+        Spacer(Modifier.height(6.dp))
+    }
+}
