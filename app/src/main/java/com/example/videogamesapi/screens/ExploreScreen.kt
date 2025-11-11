@@ -104,5 +104,27 @@ private fun TopBar(
     )
 }
 
+@Composable
+private fun SectionHeader(
+    title: String,
+    actionText: String? = null,
+    onAction: (() -> Unit)? = null
+) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 14.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(title, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold, color = OnBg)
+        Spacer(Modifier.weight(1f))
+        if (actionText != null && onAction != null) {
+            TextButton(
+                onClick = onAction,
+                colors = ButtonDefaults.textButtonColors(contentColor = Accent)
+            ) { Text(actionText, fontWeight = FontWeight.Medium) }
+        }
+    }
+}
 
 
