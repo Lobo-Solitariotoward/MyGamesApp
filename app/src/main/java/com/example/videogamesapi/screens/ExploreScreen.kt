@@ -72,3 +72,37 @@ private val action = listOf(
 // UI
 
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun TopBar(
+    genreTitle: String,
+    onBack: () -> Unit,
+    onSearch: () -> Unit,
+    onCast: () -> Unit
+) {
+    TopAppBar(
+        navigationIcon = {
+            IconButton(onClick = onBack) {
+                Icon(Icons.Rounded.ArrowBack, contentDescription = "Atrás", tint = OnBg)
+            }
+        },
+        title = {
+            Column {
+                Text("Géneros", fontSize = 12.sp, color = Muted)
+                Text(genreTitle, fontWeight = FontWeight.Bold, fontSize = 22.sp, color = OnBg)
+            }
+        },
+        actions = {
+            IconButton(onClick = onSearch) { Icon(Icons.Rounded.Search, contentDescription = "Buscar", tint = OnBg) }
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = BgColor,
+            navigationIconContentColor = OnBg,
+            titleContentColor = OnBg,
+            actionIconContentColor = OnBg
+        )
+    )
+}
+
+
+
