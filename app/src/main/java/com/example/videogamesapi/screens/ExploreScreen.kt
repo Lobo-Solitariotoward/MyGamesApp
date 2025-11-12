@@ -70,6 +70,55 @@ private val action = listOf(
 )
 
 // UI
+@Composable
+fun ExploreScreen(
+    genreTitle: String = "Aventura",
+    onBack: () -> Unit = {},
+    onSearch: () -> Unit = {},
+    onCast: () -> Unit = {},
+    onSeeAll: (String) -> Unit = {}
+) {
+    val scroll = rememberScrollState()
+
+    Scaffold(
+        topBar = {
+            TopBar(
+                genreTitle = genreTitle,
+                onBack = onBack, onSearch = onSearch, onCast = onCast
+            )
+        },
+        bottomBar = { BottomNavBar() },
+        containerColor = BgColor
+    ) { padding ->
+        Column(
+            modifier = Modifier
+                .padding(padding)
+                .fillMaxSize()
+                .background(BgColor)
+                .verticalScroll(scroll)
+        ) {
+            Spacer(Modifier.height(8.dp))
+            BannerRow(items = topBanners)
+
+            SectionHeader(
+                title = "Nuevo",
+                actionText = "Ver todo"
+            ) { onSeeAll("Nuevo") }
+
+            PosterRow(items = newReleases)
+
+            SectionHeader(
+                title = "Acción",
+                actionText = "Ver todo"
+            ) { onSeeAll("Acción") }
+
+            PosterRow(items = action)
+
+            Spacer(Modifier.height(24.dp))
+        }
+    }
+}
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -292,4 +341,10 @@ private fun BottomNavBar() {
             )
         )
     }
+}
+
+@Preview
+@Composable
+fun ExploreScreenPreview() {
+    ExploreScreen()
 }
