@@ -177,3 +177,46 @@ private fun BannerCard(game: Game) {
         Spacer(Modifier.height(6.dp))
     }
 }
+
+@Composable
+private fun PosterRow(items: List<Game>) {
+    LazyRow(
+        contentPadding = PaddingValues(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(14.dp)
+    ) {
+        items(items) { game -> PosterCard(game) }
+    }
+}
+
+@Composable
+private fun PosterCard(game: Game) {
+    Column(
+        modifier = Modifier.width(160.dp)
+    ) {
+        val shape = MaterialTheme.shapes.medium
+        AsyncImage(
+            model = game.imageUrl,
+            contentDescription = game.title,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .height(220.dp)
+                .fillMaxWidth()
+                .clip(shape)
+        )
+        Spacer(Modifier.height(8.dp))
+        Text(
+            text = game.title,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            fontWeight = FontWeight.SemiBold,
+            color = OnBg
+        )
+        Text(
+            text = game.subtitle,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            color = Muted,
+            fontSize = 12.sp
+        )
+    }
+}
