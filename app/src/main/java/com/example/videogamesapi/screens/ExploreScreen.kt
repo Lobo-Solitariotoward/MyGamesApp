@@ -220,3 +220,76 @@ private fun PosterCard(game: Game) {
         )
     }
 }
+
+@Composable
+private fun BottomNavBar() {
+    NavigationBar(
+        containerColor = BottomBar
+    ) {
+        NavigationBarItem(
+            selected = true,
+            onClick = {},
+            icon = { Text("🏠") },
+            label = { Text("Inicio") },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = OnBg,
+                selectedTextColor = OnBg,
+                unselectedIconColor = Muted,
+                unselectedTextColor = Muted,
+                indicatorColor = Accent
+            )
+        )
+        NavigationBarItem(
+            selected = false,
+            onClick = {},
+            icon = { Text("🔖") },
+            label = { Text("Mis Listas") },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = OnBg,
+                selectedTextColor = OnBg,
+                unselectedIconColor = Muted,
+                unselectedTextColor = Muted,
+                indicatorColor = Accent
+            )
+        )
+        NavigationBarItem(
+            selected = false,
+            onClick = {},
+            icon = { Text("🟧") },
+            label = { Text("Explorar") },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = OnBg,
+                selectedTextColor = OnBg,
+                unselectedIconColor = Muted,
+                unselectedTextColor = Muted,
+                indicatorColor = Accent
+            )
+        )
+        NavigationBarItem(
+            selected = false,
+            onClick = {},
+            icon = { Text("✨") },
+            label = { Text("Simulcast") },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = OnBg,
+                selectedTextColor = OnBg,
+                unselectedIconColor = Muted,
+                unselectedTextColor = Muted,
+                indicatorColor = Accent
+            )
+        )
+        NavigationBarItem(
+            selected = false,
+            onClick = {},
+            icon = { Text("👤") },
+            label = { Text("Cuenta") },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = OnBg,
+                selectedTextColor = OnBg,
+                unselectedIconColor = Muted,
+                unselectedTextColor = Muted,
+                indicatorColor = Accent
+            )
+        )
+    }
+}
