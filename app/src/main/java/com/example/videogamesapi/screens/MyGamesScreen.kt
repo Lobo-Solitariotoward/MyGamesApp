@@ -62,4 +62,3 @@ private val mockGames = listOf(
     GameTile("16","Gears 5", squareUrl("gears")),
     GameTile("17","Hi-Fi Rush", squareUrl("hifi"))
 )
-
