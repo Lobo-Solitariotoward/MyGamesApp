@@ -75,3 +75,48 @@ private fun SmallRoundIcon(icon: androidx.compose.ui.graphics.vector.ImageVector
         Icon(icon, contentDescription = contentDesc, tint = OnBg)
     }
 }
+
+@Composable
+private fun GameSquare(game: GameTile) {
+    Column {
+        val shape = RoundedCornerShape(14.dp)
+        Box(
+            modifier = Modifier
+                .aspectRatio(1f) // cuadrado
+                .clip(shape)
+                .background(CardColor)
+        ) {
+            AsyncImage(
+                model = game.imageUrl,
+                contentDescription = game.title,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
+
+            // Mini indicador (como “dispositivo” en la captura)
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(6.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(Color(0xAA000000))
+                    .padding(6.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Smartphone,
+                    contentDescription = "Disponible",
+                    tint = OnBg
+                )
+            }
+        }
+
+        Spacer(Modifier.height(6.dp))
+        Text(
+            text = game.title,
+            color = OnBg,
+            fontSize = 13.sp,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+    }
+}
