@@ -1,6 +1,5 @@
 package com.example.videogamesapi.screens
 
-import androidx.compose.runtime.Composable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -9,8 +8,15 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Chat
+import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Smartphone
 import androidx.compose.material.icons.filled.Sort
+import androidx.compose.material.icons.filled.SportsEsports
+import androidx.compose.material.icons.filled.Whatshot
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -23,19 +29,23 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
-import androidx.compose.material.icons.filled.Smartphone
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.tooling.preview.Preview
 
-//Colores
+// Paleta (misma que Chat/Explore)
 private val BgColor   = Color(0xFF0C0F27)
 private val CardColor = Color(0xFF1E1B1B)
 private val OnBg      = Color.White
 private val Muted     = Color(0xFFB0B0B0)
 private val Accent    = Color(0xFF7A6BFF)
 
-// Datos de prueba
+// --- Datos mock ---
 data class GameTile(
+    val id: String,
+    val title: String,
+    val imageUrl: String
+)
+
+data class CaptureTile(
     val id: String,
     val title: String,
     val imageUrl: String
@@ -63,6 +73,18 @@ private val mockGames = listOf(
     GameTile("17","Hi-Fi Rush", squareUrl("hifi"))
 )
 
+private val mockCaptures = listOf(
+    CaptureTile("c1","Headshot Pro • 10/10", squareUrl("cap_headshot")),
+    CaptureTile("c2","Boss vencido", squareUrl("cap_boss")),
+    CaptureTile("c3","Construcción épica", squareUrl("cap_build")),
+    CaptureTile("c4","Victoria Royale", squareUrl("cap_victory")),
+    CaptureTile("c5","Foto del clan", squareUrl("cap_clan")),
+    CaptureTile("c6","Paisaje del mapa", squareUrl("cap_landscape")),
+    CaptureTile("c7","Auto legendario", squareUrl("cap_car")),
+    CaptureTile("c8","Loot SSS", squareUrl("cap_loot")),
+    CaptureTile("c9","Combo x120", squareUrl("cap_combo"))
+)
+
 // --- UI ---
 @Composable
 fun MyGamesScreen() {
@@ -72,14 +94,13 @@ fun MyGamesScreen() {
     Scaffold(
         containerColor = BgColor,
         topBar = {
-            // Header
+            // Header grande tipo “Mi biblioteca”
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(BgColor)
                     .padding(horizontal = 16.dp, vertical = 10.dp)
             ) {
-                // titulo
                 Text(
                     text = "Mi biblioteca",
                     color = OnBg,
@@ -124,7 +145,7 @@ fun MyGamesScreen() {
 
                     Spacer(Modifier.weight(1f))
 
-
+                    // Botones ordenar / filtrar
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                         SmallRoundIcon(Icons.Filled.FilterList, contentDesc = "Filtrar")
                         SmallRoundIcon(Icons.Filled.Sort, contentDesc = "Ordenar")
@@ -132,9 +153,15 @@ fun MyGamesScreen() {
                 }
 
                 Spacer(Modifier.height(10.dp))
-                //Contador
+
+                // Contador (cambia según pestaña)
+                val countText = when (selectedTab) {
+                    0 -> "${mockCaptures.size} capturas"
+                    1 -> "${mockGames.size} juegos"
+                    else -> "0 consolas"
+                }
                 Text(
-                    text = "${mockGames.size} juegos",
+                    text = countText,
                     color = OnBg,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Medium
@@ -143,9 +170,27 @@ fun MyGamesScreen() {
             }
         }
     ) { padding ->
-        if (selectedTab == 1) {
 
-            LazyVerticalGrid(
+        when (selectedTab) {
+            // --- Capturas ---
+            0 -> LazyVerticalGrid(
+                columns = GridCells.Fixed(3),
+                modifier = Modifier
+                    .padding(padding)
+                    .fillMaxSize()
+                    .background(BgColor)
+                    .padding(horizontal = 10.dp),
+                contentPadding = PaddingValues(bottom = 20.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                items(mockCaptures) { cap ->
+                    CaptureSquare(cap)
+                }
+            }
+
+            // --- Juegos ---
+            1 -> LazyVerticalGrid(
                 columns = GridCells.Fixed(3),
                 modifier = Modifier
                     .padding(padding)
@@ -160,24 +205,20 @@ fun MyGamesScreen() {
                     GameSquare(game)
                 }
             }
-        } else {
 
-            Box(
+            // --- Consolas (placeholder) ---
+            else -> Box(
                 Modifier
                     .padding(padding)
                     .fillMaxSize()
                     .background(BgColor),
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = "Contenido de \"${tabs[selectedTab]}\"",
-                    color = Muted
-                )
+                Text(text = "Sin consolas registradas", color = Muted)
             }
         }
     }
 }
-
 
 @Composable
 private fun SmallRoundIcon(icon: androidx.compose.ui.graphics.vector.ImageVector, contentDesc: String) {
@@ -208,8 +249,7 @@ private fun GameSquare(game: GameTile) {
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop
             )
-
-            // Mini indicador (como “dispositivo” en la captura)
+            // Indicador (dispositivo)
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
@@ -225,12 +265,39 @@ private fun GameSquare(game: GameTile) {
                 )
             }
         }
-
         Spacer(Modifier.height(6.dp))
         Text(
             text = game.title,
             color = OnBg,
             fontSize = 13.sp,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+    }
+}
+
+@Composable
+private fun CaptureSquare(capture: CaptureTile) {
+    Column {
+        val shape = RoundedCornerShape(14.dp)
+        Box(
+            modifier = Modifier
+                .aspectRatio(1f) // cuadrado
+                .clip(shape)
+                .background(CardColor)
+        ) {
+            AsyncImage(
+                model = capture.imageUrl,
+                contentDescription = capture.title,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
+        }
+        Spacer(Modifier.height(6.dp))
+        Text(
+            text = capture.title,
+            color = Muted,
+            fontSize = 12.sp,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
