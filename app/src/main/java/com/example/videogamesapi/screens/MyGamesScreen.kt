@@ -62,3 +62,16 @@ private val mockGames = listOf(
     GameTile("16","Gears 5", squareUrl("gears")),
     GameTile("17","Hi-Fi Rush", squareUrl("hifi"))
 )
+
+@Composable
+private fun SmallRoundIcon(icon: androidx.compose.ui.graphics.vector.ImageVector, contentDesc: String) {
+    Box(
+        modifier = Modifier
+            .size(36.dp)
+            .clip(RoundedCornerShape(10.dp))
+            .background(CardColor),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(icon, contentDescription = contentDesc, tint = OnBg)
+    }
+}
