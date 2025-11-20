@@ -63,6 +63,122 @@ private val mockGames = listOf(
     GameTile("17","Hi-Fi Rush", squareUrl("hifi"))
 )
 
+// --- UI ---
+@Composable
+fun MyGamesScreen() {
+    var selectedTab by remember { mutableStateOf(1) } // 0: Capturas, 1: Juegos, 2: Consolas
+    val tabs = listOf("Capturas", "Juegos", "Consolas")
+
+    Scaffold(
+        containerColor = BgColor,
+        topBar = {
+            // Header
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(BgColor)
+                    .padding(horizontal = 16.dp, vertical = 10.dp)
+            ) {
+                // titulo
+                Text(
+                    text = "Mi biblioteca",
+                    color = OnBg,
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+
+                Spacer(Modifier.height(10.dp))
+
+                // Tabs
+                Row(
+                    Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    tabs.forEachIndexed { index, label ->
+                        Column(
+                            modifier = Modifier
+                                .padding(end = 18.dp)
+                                .clickable { selectedTab = index },
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = label,
+                                color = if (selectedTab == index) OnBg else Muted,
+                                fontSize = 16.sp,
+                                fontWeight = if (selectedTab == index) FontWeight.SemiBold else FontWeight.Normal
+                            )
+                            Spacer(Modifier.height(4.dp))
+                            if (selectedTab == index) {
+                                Box(
+                                    Modifier
+                                        .height(3.dp)
+                                        .width(56.dp)
+                                        .clip(RoundedCornerShape(2.dp))
+                                        .background(OnBg)
+                                )
+                            } else {
+                                Spacer(Modifier.height(3.dp))
+                            }
+                        }
+                    }
+
+                    Spacer(Modifier.weight(1f))
+
+
+                    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                        SmallRoundIcon(Icons.Filled.FilterList, contentDesc = "Filtrar")
+                        SmallRoundIcon(Icons.Filled.Sort, contentDesc = "Ordenar")
+                    }
+                }
+
+                Spacer(Modifier.height(10.dp))
+                //Contador
+                Text(
+                    text = "${mockGames.size} juegos",
+                    color = OnBg,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Medium
+                )
+                Spacer(Modifier.height(8.dp))
+            }
+        }
+    ) { padding ->
+        if (selectedTab == 1) {
+
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(3),
+                modifier = Modifier
+                    .padding(padding)
+                    .fillMaxSize()
+                    .background(BgColor)
+                    .padding(horizontal = 10.dp),
+                contentPadding = PaddingValues(bottom = 20.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                items(mockGames) { game ->
+                    GameSquare(game)
+                }
+            }
+        } else {
+
+            Box(
+                Modifier
+                    .padding(padding)
+                    .fillMaxSize()
+                    .background(BgColor),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "Contenido de \"${tabs[selectedTab]}\"",
+                    color = Muted
+                )
+            }
+        }
+    }
+}
+
+
 @Composable
 private fun SmallRoundIcon(icon: androidx.compose.ui.graphics.vector.ImageVector, contentDesc: String) {
     Box(
@@ -119,4 +235,10 @@ private fun GameSquare(game: GameTile) {
             overflow = TextOverflow.Ellipsis
         )
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun MyGamesScreenPreview() {
+    MyGamesScreen()
 }
