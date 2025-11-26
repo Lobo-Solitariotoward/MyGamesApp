@@ -60,7 +60,6 @@ class MyGamesRepository (){
     }
 
     fun getGameDetail(gameId: Int): GamesDetail {
-        // Usamos datos mock para el juego de ejemplo (VALORANT)
         return GamesDetail(
             id = 101,
             title = "Valorant",
