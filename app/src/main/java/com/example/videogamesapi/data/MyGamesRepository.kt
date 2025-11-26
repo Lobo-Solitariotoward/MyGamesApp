@@ -2,7 +2,9 @@ package com.example.videogamesapi.data
 
 import com.example.videogamesapi.models.Category
 import com.example.videogamesapi.models.Games
+import com.example.videogamesapi.models.GamesDetail
 import com.example.videogamesapi.models.News
+import com.example.videogamesapi.models.PlayerOnline
 
 class MyGamesRepository (){
     private val mockCategories = listOf(
@@ -55,6 +57,32 @@ class MyGamesRepository (){
 
     fun getNews(): List<News> {
         return mockNews
+    }
+
+    fun getGameDetail(gameId: Int): GamesDetail {
+        // Usamos datos mock para el juego de ejemplo (VALORANT)
+        return GamesDetail(
+            id = 101,
+            title = "Valorant",
+            category = "Shooter",
+            headerImageUrl = "url/valorant_header.jpg",
+            avatarImageUrl = "url/valorant_logo.png",
+            description = "Valorant is a free-to-play first-person hero shooter developed and published by Riot Games, featuring a blend of precise gunplay and tactical ability usage. The game focuses on team-based objective modes. Read more",
+            rating = "4.8",
+            playTime = "50h+",
+            playerCount = "50.6M",
+            screenshots = listOf(
+                "url/screenshot1.jpg",
+                "url/screenshot2.jpg",
+                "url/screenshot3.jpg"
+            ),
+            playersOnline = listOf(
+                PlayerOnline("@userio11", "url/avatar1.jpg"),
+                PlayerOnline("@gamerX", "url/avatar2.jpg"),
+                PlayerOnline("@Pro_Killer", "url/avatar3.jpg"),
+                PlayerOnline("@Cat11", "url/avatar4.jpg"),
+            )
+        )
     }
 
 }
