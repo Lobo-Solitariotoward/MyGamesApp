@@ -1,5 +1,6 @@
 package com.example.videogamesapi.models
 
+
 data class GamesDetail (
     val id: Int,
     val title: String,
@@ -7,18 +8,11 @@ data class GamesDetail (
     val headerImageUrl: String,
     val avatarImageUrl: String,
     val description: String,
-    val followers: String,
-    val players: String,
-    val streamers: String,
-    val liveStreams: List<LiveStream>,
+    val rating: String,
+    val playTime: String,
+    val playerCount: String,
+    val screenshots: List<String>, // Galería de imágenes del juego (reemplaza streams)
     val playersOnline: List<PlayerOnline>
-)
-
-data class LiveStream(
-    val title: String,
-    val user: String,
-    val viewerCount: String,
-    val streamImageUrl: String
 )
 
 data class PlayerOnline(
