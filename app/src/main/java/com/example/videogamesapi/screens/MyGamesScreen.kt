@@ -24,21 +24,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.videogamesapi.models.Games
+import com.example.videogamesapi.screens.viewmodel.HomeViewModel
 
-// Paleta (misma que Chat/Explore)
+// Paleta
 private val BgColor   = Color(0xFF0C0F27)
 private val CardColor = Color(0xFF1E1B1B)
 private val OnBg      = Color.White
 private val Muted     = Color(0xFFB0B0B0)
 private val Accent    = Color(0xFF7A6BFF)
 
-// --- Datos mock ---
-data class GameTile(
-    val id: String,
-    val title: String,
-    val imageUrl: String
-)
-
+// --- Datos mock (solo para Capturas y Consolas) ---
 data class CaptureTile(
     val id: String,
     val title: String,
@@ -53,29 +50,9 @@ data class ConsoleTile(
 
 private fun squareUrl(seed: String) = "https://picsum.photos/seed/$seed/600/600"
 
-private val mockGames = listOf(
-    GameTile("1","Call of Duty: La Maldición", squareUrl("cod_maldicion")),
-    GameTile("2","Candy Saga", squareUrl("candysaga")),
-    GameTile("3","Fallout", squareUrl("fallout1")),
-    GameTile("4","Fallout 2", squareUrl("fallout2")),
-    GameTile("5","Fallout 3", squareUrl("fallout3")),
-    GameTile("6","Fallout New Vegas", squareUrl("newvegas")),
-    GameTile("7","Fortnite", squareUrl("fortnite")),
-    GameTile("8","Killer Instinct", squareUrl("ki")),
-    GameTile("9","Minecraft", squareUrl("minecraft1")),
-    GameTile("10","Minecraft Preview", squareUrl("minecraft2")),
-    GameTile("11","Retro Arcade", squareUrl("retro")),
-    GameTile("12","Ori and the Forest", squareUrl("ori")),
-    GameTile("13","Sea of Thieves", squareUrl("sea")),
-    GameTile("14","Forza Horizon", squareUrl("forza")),
-    GameTile("15","Halo Infinite", squareUrl("halo")),
-    GameTile("16","Gears 5", squareUrl("gears")),
-    GameTile("17","Hi-Fi Rush", squareUrl("hifi"))
-)
-
 private val mockCaptures = listOf(
     CaptureTile("c1","Headshot Pro • 10/10", squareUrl("cap_headshot")),
-    CaptureTile("c2","Boss vencido", squareUrl("https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjhtmGR2aKXpiiqfhqKb2_qPSLHav66eEpZYKYjoyo2xoZAaKxHW27wIXA4bPJ9AN-VCDTVb7-nWQRnoER4Ect6t-KiSsSyC_QFXUCp8S6b4AeO_f3SeZzjZQAR4vqS-6xdNEVXug9JPhA/s1600/Bloodborne%25E2%2584%25A2_20150525225756.jpg")),
+    CaptureTile("c2","Boss vencido", "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjhtmGR2aKXpiiqfhqKb2_qPSLHav66eEpZYKYjoyo2xoZAaKxHW27wIXA4bPJ9AN-VCDTVb7-nWQRnoER4Ect6t-KiSsSyC_QFXUCp8S6b4AeO_f3SeZzjZQAR4vqS-6xdNEVXug9JPhA/s1600/Bloodborne%25E2%2584%25A2_20150525225756.jpg"),
     CaptureTile("c3","Construcción épica", squareUrl("cap_build")),
     CaptureTile("c4","Victoria Royale", squareUrl("cap_victory")),
     CaptureTile("c5","Foto del clan", squareUrl("cap_clan")),
@@ -95,9 +72,16 @@ private val mockConsoles = listOf(
 
 // --- UI ---
 @Composable
-fun MyGamesScreen() {
+fun MyGamesScreen(
+    viewModel: HomeViewModel = viewModel()
+) {
     var selectedTab by remember { mutableStateOf(1) } // 0: Capturas, 1: Juegos, 2: Consolas
     val tabs = listOf("Capturas", "Juegos", "Consolas")
+
+    // Juegos desde la API
+    val games by viewModel.games.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+    val error by viewModel.error.collectAsState()
 
     Scaffold(
         containerColor = BgColor,
@@ -153,7 +137,6 @@ fun MyGamesScreen() {
 
                     Spacer(Modifier.weight(1f))
 
-
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                         SmallRoundIcon(Icons.Filled.FilterList, contentDesc = "Filtrar")
                         SmallRoundIcon(Icons.Filled.Sort, contentDesc = "Ordenar")
@@ -162,10 +145,10 @@ fun MyGamesScreen() {
 
                 Spacer(Modifier.height(10.dp))
 
-                // Contador segun la ventana que estes
+                // Contador segun la pestaña
                 val countText = when (selectedTab) {
                     0 -> "${mockCaptures.size} capturas"
-                    1 -> "${mockGames.size} juegos"
+                    1 -> "${games.size} juegos"
                     else -> "${mockConsoles.size} consolas"
                 }
                 Text(
@@ -180,7 +163,7 @@ fun MyGamesScreen() {
     ) { padding ->
 
         when (selectedTab) {
-            // --- Capturas ---
+            // --- Capturas (mock) ---
             0 -> LazyVerticalGrid(
                 columns = GridCells.Fixed(3),
                 modifier = Modifier
@@ -197,24 +180,57 @@ fun MyGamesScreen() {
                 }
             }
 
-            // --- Juegos ---
-            1 -> LazyVerticalGrid(
-                columns = GridCells.Fixed(3),
-                modifier = Modifier
-                    .padding(padding)
-                    .fillMaxSize()
-                    .background(BgColor)
-                    .padding(horizontal = 10.dp),
-                contentPadding = PaddingValues(bottom = 20.dp),
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(mockGames) { game ->
-                    GameSquare(game)
+            // --- Juegos (API) ---
+            1 -> {
+                when {
+                    isLoading -> {
+                        Box(
+                            Modifier
+                                .padding(padding)
+                                .fillMaxSize()
+                                .background(BgColor),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(color = Accent)
+                        }
+                    }
+
+                    error != null -> {
+                        Box(
+                            Modifier
+                                .padding(padding)
+                                .fillMaxSize()
+                                .background(BgColor),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = error ?: "Error al cargar juegos",
+                                color = OnBg
+                            )
+                        }
+                    }
+
+                    else -> {
+                        LazyVerticalGrid(
+                            columns = GridCells.Fixed(3),
+                            modifier = Modifier
+                                .padding(padding)
+                                .fillMaxSize()
+                                .background(BgColor)
+                                .padding(horizontal = 10.dp),
+                            contentPadding = PaddingValues(bottom = 20.dp),
+                            horizontalArrangement = Arrangement.spacedBy(10.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            items(games) { game ->
+                                GameSquare(game)
+                            }
+                        }
+                    }
                 }
             }
 
-            // --- Consolas ---
+            // --- Consolas (mock) ---
             else -> LazyVerticalGrid(
                 columns = GridCells.Fixed(3),
                 modifier = Modifier
@@ -247,8 +263,9 @@ private fun SmallRoundIcon(icon: androidx.compose.ui.graphics.vector.ImageVector
     }
 }
 
+// Ahora GameSquare usa el modelo Games (de la API)
 @Composable
-private fun GameSquare(game: GameTile) {
+private fun GameSquare(game: Games) {
     Column {
         val shape = RoundedCornerShape(14.dp)
         Box(
@@ -258,7 +275,7 @@ private fun GameSquare(game: GameTile) {
                 .background(CardColor)
         ) {
             AsyncImage(
-                model = game.imageUrl,
+                model = game.image,
                 contentDescription = game.title,
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop

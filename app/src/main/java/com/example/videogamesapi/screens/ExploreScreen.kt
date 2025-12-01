@@ -8,14 +8,15 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
-import androidx.compose.material.icons.rounded.Cast
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -23,51 +24,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import androidx.compose.material3.TopAppBar
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.videogamesapi.screens.BottomBar
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.videogamesapi.models.Games
+import com.example.videogamesapi.screens.viewmodel.HomeViewModel
 
-
-// Paleta tomada de colores
-
+// Paleta de colores
 private val BgColor = Color(0xFF0C0F27)
 private val Accent = Color(0xFF7A6BFF)
 private val OnBg = Color.White
 private val Muted = Color(0xFFB0B0B0)
 private val BottomBar = Color(0xFF1E1B1B)
-
-
-// Datos de ejemplo
-
-data class Game(
-    val id: String,
-    val title: String,
-    val subtitle: String,
-    val imageUrl: String
-)
-
-private fun posterUrl(seed: String) = "https://picsum.photos/seed/$seed/600/900"
-private fun bannerUrl(seed: String) = "https://picsum.photos/seed/$seed/1280/720"
-
-private val topBanners = listOf(
-    Game("op", "Elden Ring", "RPG • Souls-like", bannerUrl("eldenring")),
-    Game("ds", "Starfield", "RPG • Sci-Fi", bannerUrl("starfield")),
-    Game("cv", "Hades II", "Rogue-like", bannerUrl("hades2"))
-)
-
-private val newReleases = listOf(
-    Game("g1", "Let This Grieving Soul Retry", "Hace 2 horas • Subtítulos", posterUrl("retry1")),
-    Game("g2", "The Banished Court Magician", "Hace 2 horas • Dob/ Sub", posterUrl("banished1")),
-    Game("g3", "A Wild Last Boss Appeared", "Hace 2 horas • Dob Japonés", posterUrl("boss1")),
-    Game("g4", "Chronicles of Aether", "Hace 3 horas • Subtítulos", posterUrl("aether1"))
-)
-
-private val action = listOf(
-    Game("a1", "Scarlet Blade", "Acción • Hack & Slash", posterUrl("scarlet1")),
-    Game("a2", "Azure Saga", "Acción • RPG", posterUrl("azure1")),
-    Game("a3", "Iron Vanguard", "Acción • Shooter", posterUrl("iron1")),
-    Game("a4", "Dragon Runes", "Acción • Aventura", posterUrl("dragon1"))
-)
 
 // UI
 @Composable
@@ -76,15 +43,28 @@ fun ExploreScreen(
     onBack: () -> Unit = {},
     onSearch: () -> Unit = {},
     onCast: () -> Unit = {},
-    onSeeAll: (String) -> Unit = {}
+    onSeeAll: (String) -> Unit = {},
+    viewModel: HomeViewModel = viewModel()
 ) {
     val scroll = rememberScrollState()
+
+    // Juegos desde el ViewModel
+    val games by viewModel.games.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+    val error by viewModel.error.collectAsState()
+
+    // Derivar secciones a partir de la lista
+    val topBanners = games.take(3)
+    val newReleases = games.take(8) // por ejemplo, primeros 8
+    val action = games.filter { it.gender.contains("acción", ignoreCase = true) }
 
     Scaffold(
         topBar = {
             TopBar(
                 genreTitle = genreTitle,
-                onBack = onBack, onSearch = onSearch, onCast = onCast
+                onBack = onBack,
+                onSearch = onSearch,
+                onCast = onCast
             )
         },
         bottomBar = { BottomNavBar() },
@@ -97,29 +77,75 @@ fun ExploreScreen(
                 .background(BgColor)
                 .verticalScroll(scroll)
         ) {
-            Spacer(Modifier.height(8.dp))
-            BannerRow(items = topBanners)
+            when {
+                isLoading -> {
+                    Box(
+                        Modifier
+                            .fillMaxSize()
+                            .padding(top = 40.dp),
+                        contentAlignment = Alignment.TopCenter
+                    ) {
+                        CircularProgressIndicator(color = Accent)
+                    }
+                }
 
-            SectionHeader(
-                title = "Nuevo",
-                actionText = "Ver todo"
-            ) { onSeeAll("Nuevo") }
+                error != null -> {
+                    Box(
+                        Modifier
+                            .fillMaxSize()
+                            .padding(24.dp),
+                        contentAlignment = Alignment.TopCenter
+                    ) {
+                        Text(
+                            text = error ?: "Ocurrió un error",
+                            color = OnBg
+                        )
+                    }
+                }
 
-            PosterRow(items = newReleases)
+                games.isEmpty() -> {
+                    Box(
+                        Modifier
+                            .fillMaxSize()
+                            .padding(24.dp),
+                        contentAlignment = Alignment.TopCenter
+                    ) {
+                        Text("No hay juegos disponibles", color = OnBg)
+                    }
+                }
 
-            SectionHeader(
-                title = "Acción",
-                actionText = "Ver todo"
-            ) { onSeeAll("Acción") }
+                else -> {
+                    Spacer(Modifier.height(8.dp))
 
-            PosterRow(items = action)
+                    // Carrusel superior
+                    if (topBanners.isNotEmpty()) {
+                        BannerRow(items = topBanners)
+                    }
 
-            Spacer(Modifier.height(24.dp))
+                    // Sección "Nuevo"
+                    SectionHeader(
+                        title = "Nuevo",
+                        actionText = "Ver todo"
+                    ) { onSeeAll("Nuevo") }
+
+                    PosterRow(items = newReleases)
+
+                    // Sección "Acción"
+                    if (action.isNotEmpty()) {
+                        SectionHeader(
+                            title = "Acción",
+                            actionText = "Ver todo"
+                        ) { onSeeAll("Acción") }
+
+                        PosterRow(items = action)
+                    }
+
+                    Spacer(Modifier.height(24.dp))
+                }
+            }
         }
     }
 }
-
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -142,7 +168,9 @@ private fun TopBar(
             }
         },
         actions = {
-            IconButton(onClick = onSearch) { Icon(Icons.Rounded.Search, contentDescription = "Buscar", tint = OnBg) }
+            IconButton(onClick = onSearch) {
+                Icon(Icons.Rounded.Search, contentDescription = "Buscar", tint = OnBg)
+            }
         },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = BgColor,
@@ -165,7 +193,12 @@ private fun SectionHeader(
             .padding(horizontal = 16.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(title, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold, color = OnBg)
+        Text(
+            title,
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.SemiBold,
+            color = OnBg
+        )
         Spacer(Modifier.weight(1f))
         if (actionText != null && onAction != null) {
             TextButton(
@@ -177,7 +210,7 @@ private fun SectionHeader(
 }
 
 @Composable
-private fun BannerRow(items: List<Game>) {
+private fun BannerRow(items: List<Games>) {
     LazyRow(
         contentPadding = PaddingValues(horizontal = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -190,7 +223,7 @@ private fun BannerRow(items: List<Game>) {
 }
 
 @Composable
-private fun BannerCard(game: Game) {
+private fun BannerCard(game: Games) {
     val shape = MaterialTheme.shapes.medium
     Column(
         modifier = Modifier
@@ -198,7 +231,7 @@ private fun BannerCard(game: Game) {
             .clip(shape)
     ) {
         AsyncImage(
-            model = game.imageUrl,
+            model = game.image,
             contentDescription = game.title,
             modifier = Modifier
                 .fillMaxWidth()
@@ -216,7 +249,7 @@ private fun BannerCard(game: Game) {
             color = OnBg
         )
         Text(
-            text = game.subtitle,
+            text = "${game.developer} • ${game.gender}",
             modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
@@ -228,7 +261,7 @@ private fun BannerCard(game: Game) {
 }
 
 @Composable
-private fun PosterRow(items: List<Game>) {
+private fun PosterRow(items: List<Games>) {
     LazyRow(
         contentPadding = PaddingValues(horizontal = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(14.dp)
@@ -238,13 +271,13 @@ private fun PosterRow(items: List<Game>) {
 }
 
 @Composable
-private fun PosterCard(game: Game) {
+private fun PosterCard(game: Games) {
     Column(
         modifier = Modifier.width(160.dp)
     ) {
         val shape = MaterialTheme.shapes.medium
         AsyncImage(
-            model = game.imageUrl,
+            model = game.image,
             contentDescription = game.title,
             contentScale = ContentScale.Crop,
             modifier = Modifier
@@ -261,7 +294,7 @@ private fun PosterCard(game: Game) {
             color = OnBg
         )
         Text(
-            text = game.subtitle,
+            text = "${game.developer} • ★ ${game.rating}",
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             color = Muted,
@@ -343,8 +376,9 @@ private fun BottomNavBar() {
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 fun ExploreScreenPreview() {
+
     ExploreScreen()
 }

@@ -1,5 +1,7 @@
 package com.example.videogamesapi.models
 
+import java.io.Serializable
+
 data class Games(
     val id: String,
     val title: String,
@@ -8,4 +10,4 @@ data class Games(
     val image: String,
     val rating: Double,
     val gender: String
-)
+) : Serializable
