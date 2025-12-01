@@ -75,7 +75,7 @@ private val mockGames = listOf(
 
 private val mockCaptures = listOf(
     CaptureTile("c1","Headshot Pro • 10/10", squareUrl("cap_headshot")),
-    CaptureTile("c2","Boss vencido", squareUrl("cap_boss")),
+    CaptureTile("c2","Boss vencido", squareUrl("https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjhtmGR2aKXpiiqfhqKb2_qPSLHav66eEpZYKYjoyo2xoZAaKxHW27wIXA4bPJ9AN-VCDTVb7-nWQRnoER4Ect6t-KiSsSyC_QFXUCp8S6b4AeO_f3SeZzjZQAR4vqS-6xdNEVXug9JPhA/s1600/Bloodborne%25E2%2584%25A2_20150525225756.jpg")),
     CaptureTile("c3","Construcción épica", squareUrl("cap_build")),
     CaptureTile("c4","Victoria Royale", squareUrl("cap_victory")),
     CaptureTile("c5","Foto del clan", squareUrl("cap_clan")),

@@ -105,7 +105,7 @@ fun HomeScreen(
             SectionHeader(title = "Trending Games")
             TrendingGamesList(
                 games = trendingGamesState,
-                onGameClicked = { gameId -> /* Acción de navegación */ }
+                onGameClicked = { gameId ->  }
             )
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -113,7 +113,7 @@ fun HomeScreen(
             SectionHeader(title = "New Games")
             NewGamesList(
                 games = newGamesState,
-                onGameClicked = { gameId -> /* Acción de navegación */ }
+                onGameClicked = { gameId ->  }
             )
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -125,7 +125,7 @@ fun HomeScreen(
                 modifier = Modifier.padding(bottom = 16.dp)
             ) {
                 items(recommendedGamesState, key = { it.id }) { game ->
-                    RecommendedGameCard(game = game, onGameClicked = { gameId -> /* ... */ })
+                    RecommendedGameCard(game = game, onGameClicked = { gameId ->  })
                 }
             }
 
@@ -136,10 +136,10 @@ fun HomeScreen(
             Column(
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
-                    .padding(bottom = 16.dp) // Espacio adicional en la parte inferior
+                    .padding(bottom = 16.dp)
             ) {
                 news.forEach { article ->
-                    NewsArticleItem(article = article, onArticleClicked = { articleId -> /* ... */ })
+                    NewsArticleItem(article = article, onArticleClicked = { articleId -> })
                     Divider(color = Color.DarkGray, thickness = 0.5.dp)
                 }
             }
@@ -168,7 +168,7 @@ fun SectionHeader(title: String) {
             text = "See all",
             style = MaterialTheme.typography.labelMedium,
             color = Color.LightGray.copy(alpha = 0.7f),
-            modifier = Modifier.clickable { /* Acción para ver más */ }
+            modifier = Modifier.clickable {  }
         )
     }
 }
