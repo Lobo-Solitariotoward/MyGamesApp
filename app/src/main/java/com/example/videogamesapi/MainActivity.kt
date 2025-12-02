@@ -12,6 +12,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.videogamesapi.screens.ExploreScreen
+import com.example.videogamesapi.screens.HomeScreen
+import com.example.videogamesapi.screens.HomeScreenPreview
 //import com.example.videogamesapi.screens.HomeScreen
 import com.example.videogamesapi.screens.MyGamesScreen
 import com.example.videogamesapi.ui.theme.VideogamesapiTheme
@@ -20,7 +22,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MyGamesScreen()
+            HomeScreenPreview()
         }
     }
 }
