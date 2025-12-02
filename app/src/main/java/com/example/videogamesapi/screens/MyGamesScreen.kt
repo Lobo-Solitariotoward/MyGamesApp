@@ -1,5 +1,6 @@
 package com.example.videogamesapi.screens
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -20,13 +21,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil3.compose.AsyncImage
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil3.compose.AsyncImage
 import com.example.videogamesapi.models.Games
-import com.example.videogamesapi.screens.viewmodel.HomeViewModel
+import com.example.videogamesapi.screens.viewmodel.MyGamesViewModel
+import com.example.videogamesapi.R
+
 
 // Paleta
 private val BgColor   = Color(0xFF0C0F27)
@@ -35,7 +38,7 @@ private val OnBg      = Color.White
 private val Muted     = Color(0xFFB0B0B0)
 private val Accent    = Color(0xFF7A6BFF)
 
-// --- Datos mock (solo para Capturas y Consolas) ---
+// --- Datos mock (solo para Capturas y Consolas)
 data class CaptureTile(
     val id: String,
     val title: String,
@@ -45,43 +48,44 @@ data class CaptureTile(
 data class ConsoleTile(
     val id: String,
     val name: String,
-    val imageUrl: String
+   @DrawableRes val imageRes: Int
 )
 
 private fun squareUrl(seed: String) = "https://picsum.photos/seed/$seed/600/600"
 
 private val mockCaptures = listOf(
-    CaptureTile("c1","Headshot Pro • 10/10", squareUrl("cap_headshot")),
-    CaptureTile("c2","Boss vencido", "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjhtmGR2aKXpiiqfhqKb2_qPSLHav66eEpZYKYjoyo2xoZAaKxHW27wIXA4bPJ9AN-VCDTVb7-nWQRnoER4Ect6t-KiSsSyC_QFXUCp8S6b4AeO_f3SeZzjZQAR4vqS-6xdNEVXug9JPhA/s1600/Bloodborne%25E2%2584%25A2_20150525225756.jpg"),
-    CaptureTile("c3","Construcción épica", squareUrl("cap_build")),
-    CaptureTile("c4","Victoria Royale", squareUrl("cap_victory")),
-    CaptureTile("c5","Foto del clan", squareUrl("cap_clan")),
-    CaptureTile("c6","Paisaje del mapa", squareUrl("cap_landscape")),
-    CaptureTile("c7","Auto legendario", squareUrl("cap_car")),
-    CaptureTile("c8","Loot SSS", squareUrl("cap_loot")),
-    CaptureTile("c9","Combo x120", squareUrl("cap_combo"))
+    CaptureTile("c1","Headshot Pro • 10/10", squareUrl("https://www.callofduty.com/content/dam/atvi/callofduty/cod-touchui/legacy/wwii/features/multiplayer/CoD_WWII_Launch_MP_01_wm.png")),
+    CaptureTile("c2","Boss vencido", "https://oyster.ignimgs.com/mediawiki/apis.ign.com/stellar-blade/3/3e/Stellar_Blade_20240423020811.jpg"),
+    CaptureTile("c3","Construcción épica", squareUrl("https://i.ytimg.com/vi/4jwYtfvBjhU/maxresdefault.jpg")),
+    CaptureTile("c4","Victoria Royale", squareUrl("https://cdn.mos.cms.futurecdn.net/snabQjTr66r3GPVAfPNqnH.jpg")),
+    CaptureTile("c5","Foto del clan", squareUrl("https://blz-contentstack-images.akamaized.net/v3/assets/blt2477dcaf4ebd440c/bltdabc3782553659f1/6785b50a1970a9f14eb5ccd7/xboxshowcase.png")),
+    CaptureTile("c6","Paisaje del mapa", squareUrl("https://www.theloadout.com/wp-content/uploads/2022/02/elden-ring-review-1.jpg")),
+    CaptureTile("c7","Auto legendario", squareUrl("https://media.moddb.com/images/mods/1/35/34792/7-2-1404842988.jpg")),
+    CaptureTile("c8","Loot SSS", squareUrl("https://staticctf.ubisoft.com/J3yJr34U2pZ2Ieem48Dwy9uqj5PNUQTn/4CdAD2JX2wqu1ytWiPxP3j/8e20767528333b13e640611147069018/-ACII-_Screenshots_-_5.jpg")),
+    CaptureTile("c9","Combo x120", squareUrl("https://staticg.sportskeeda.com/editor/2022/09/123b7-16621326050136-1920.jpg"))
 )
 
 private val mockConsoles = listOf(
-    ConsoleTile("p5", "PlayStation 5", squareUrl("playstation5")),
-    ConsoleTile("xsx", "Xbox Series X", squareUrl("xboxseriesx")),
-    ConsoleTile("nsw", "Nintendo Switch", squareUrl("nintendoswitch")),
-    ConsoleTile("sd", "Steam Deck", squareUrl("steamdeck")),
-    ConsoleTile("nsw2", "Nintendo Switch 2", squareUrl("nintendoswitch2"))
+    ConsoleTile("p5", "PlayStation 5", R.drawable.ps5),
+    ConsoleTile("xsx", "Xbox Series X", R.drawable.xsx),
+    ConsoleTile("nsw", "Nintendo Switch", R.drawable.ns1),
+    ConsoleTile("sd", "Steam Deck", R.drawable.stm),
+    ConsoleTile("nsw2", "Nintendo Switch 2", R.drawable.ns2)
 )
 
 // --- UI ---
 @Composable
 fun MyGamesScreen(
-    viewModel: HomeViewModel = viewModel()
+    viewModel: MyGamesViewModel = viewModel()
 ) {
     var selectedTab by remember { mutableStateOf(1) } // 0: Capturas, 1: Juegos, 2: Consolas
     val tabs = listOf("Capturas", "Juegos", "Consolas")
 
-    // Juegos desde la API
-    val games by viewModel.games.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
-    val error by viewModel.error.collectAsState()
+
+    val state = viewModel.uiState
+    val games = state.games
+    val isLoading = state.isLoading
+    val error = state.errorMessage
 
     Scaffold(
         containerColor = BgColor,
@@ -91,7 +95,7 @@ fun MyGamesScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(BgColor)
-                    .padding(horizontal = 16.dp, vertical = 10.dp)
+                    .padding(horizontal = 16.dp, vertical = 50.dp)
             ) {
                 Text(
                     text = "Mi biblioteca",
@@ -145,7 +149,7 @@ fun MyGamesScreen(
 
                 Spacer(Modifier.height(10.dp))
 
-                // Contador segun la pestaña
+                // Contador según la pestaña
                 val countText = when (selectedTab) {
                     0 -> "${mockCaptures.size} capturas"
                     1 -> "${games.size} juegos"
@@ -163,7 +167,7 @@ fun MyGamesScreen(
     ) { padding ->
 
         when (selectedTab) {
-            // --- Capturas (mock) ---
+            // Capturas (mock)
             0 -> LazyVerticalGrid(
                 columns = GridCells.Fixed(3),
                 modifier = Modifier
@@ -180,7 +184,7 @@ fun MyGamesScreen(
                 }
             }
 
-            // --- Juegos (API) ---
+            // Juegos (API)
             1 -> {
                 when {
                     isLoading -> {
@@ -230,7 +234,7 @@ fun MyGamesScreen(
                 }
             }
 
-            // --- Consolas (mock) ---
+            // Consolas (mock)
             else -> LazyVerticalGrid(
                 columns = GridCells.Fixed(3),
                 modifier = Modifier
@@ -251,7 +255,10 @@ fun MyGamesScreen(
 }
 
 @Composable
-private fun SmallRoundIcon(icon: androidx.compose.ui.graphics.vector.ImageVector, contentDesc: String) {
+private fun SmallRoundIcon(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    contentDesc: String
+) {
     Box(
         modifier = Modifier
             .size(36.dp)
@@ -263,7 +270,7 @@ private fun SmallRoundIcon(icon: androidx.compose.ui.graphics.vector.ImageVector
     }
 }
 
-// Ahora GameSquare usa el modelo Games (de la API)
+// Card de juego usando Games del API
 @Composable
 private fun GameSquare(game: Games) {
     Column {
@@ -280,7 +287,6 @@ private fun GameSquare(game: Games) {
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop
             )
-            // Indicador (dispositivo)
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
@@ -346,7 +352,7 @@ private fun ConsoleSquare(console: ConsoleTile) {
                 .background(CardColor)
         ) {
             AsyncImage(
-                model = console.imageUrl,
+                model = console.imageRes,
                 contentDescription = console.name,
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop

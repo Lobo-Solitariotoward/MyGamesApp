@@ -39,7 +39,7 @@ private val BottomBar = Color(0xFF1E1B1B)
 // UI
 @Composable
 fun ExploreScreen(
-    genreTitle: String = "Aventura",
+    genreTitle: String = "Lo más vendido",
     onBack: () -> Unit = {},
     onSearch: () -> Unit = {},
     onCast: () -> Unit = {},
@@ -53,10 +53,24 @@ fun ExploreScreen(
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
 
-    // Derivar secciones a partir de la lista
-    val topBanners = games.take(3)
-    val newReleases = games.take(8) // por ejemplo, primeros 8
-    val action = games.filter { it.gender.contains("acción", ignoreCase = true) }
+    // Agrupar juegos por categoría
+    val gamesByGenre: Map<String, List<Games>> =
+        games.groupBy { it.gender.ifBlank { "Otros" } }
+
+    // Orden de géneros: primero el que viene en genretitlef, luego el resto alfabéticamente
+    val orderedGenres: List<String> = buildList {
+        if (gamesByGenre.containsKey(genreTitle)) add(genreTitle)
+        addAll(
+            gamesByGenre.keys
+                .filter { it != genreTitle }
+                .sorted()
+        )
+    }
+
+    // Carrusel superior: si hay juegos del género seleccionado, usamos esos; si no, los primeros 3 de todos
+    val topBanners: List<Games> =
+        (gamesByGenre[genreTitle].orEmpty().take(3))
+            .ifEmpty { games.take(3) }
 
     Scaffold(
         topBar = {
@@ -122,22 +136,18 @@ fun ExploreScreen(
                         BannerRow(items = topBanners)
                     }
 
-                    // Sección "Nuevo"
-                    SectionHeader(
-                        title = "Nuevo",
-                        actionText = "Ver todo"
-                    ) { onSeeAll("Nuevo") }
-
-                    PosterRow(items = newReleases)
-
-                    // Sección "Acción"
-                    if (action.isNotEmpty()) {
-                        SectionHeader(
-                            title = "Acción",
-                            actionText = "Ver todo"
-                        ) { onSeeAll("Acción") }
-
-                        PosterRow(items = action)
+                    // Secciones por categoría real
+                    orderedGenres.forEach { genre ->
+                        val list = gamesByGenre[genre].orEmpty()
+                        if (list.isNotEmpty()) {
+                            SectionHeader(
+                                title = genre,
+                                actionText = "Ver todo"
+                            ) {
+                                onSeeAll(genre)
+                            }
+                            PosterRow(items = list)
+                        }
                     }
 
                     Spacer(Modifier.height(24.dp))
@@ -215,9 +225,7 @@ private fun BannerRow(items: List<Games>) {
         contentPadding = PaddingValues(horizontal = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        items(items) { game ->
-            BannerCard(game)
-        }
+        items(items) { game -> BannerCard(game) }
     }
     Spacer(Modifier.height(8.dp))
 }
@@ -379,6 +387,5 @@ private fun BottomNavBar() {
 @Preview(showBackground = true)
 @Composable
 fun ExploreScreenPreview() {
-
     ExploreScreen()
 }
