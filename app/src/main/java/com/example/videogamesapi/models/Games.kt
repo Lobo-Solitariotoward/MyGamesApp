@@ -1,9 +1,13 @@
 package com.example.videogamesapi.models
 
-data class Games(
-    val id : Int,
-    val title : String,
-    val categories: String,
-    val imageUrl: String
-)
+import java.io.Serializable
 
+data class Games(
+    val id: String,
+    val title: String,
+    val developer: String,
+    val description: String,
+    val image: String,
+    val rating: Double,
+    val gender: String
+) : Serializable
