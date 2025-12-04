@@ -12,6 +12,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -99,6 +100,19 @@ fun LoginScreen(){
                                                 )
                                         },
                                 )
+                                Spacer(modifier = Modifier.height(25.dp))
+                                Button(
+                                        modifier = Modifier
+                                                .fillMaxWidth(),
+                                        onClick = { }
+                                ) {
+                                        Text(
+                                                text = "Login", fontSize = 15.sp
+                                        )
+                                }
+                                Spacer(modifier = Modifier.height(20.dp))
+                                Text(text = "Don´t have account? Sign up ", color = Color.White)
+
 
 
 
