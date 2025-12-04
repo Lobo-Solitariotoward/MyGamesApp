@@ -13,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -129,6 +130,17 @@ fun RegisterScreen(){
                         )
                     },
                 )
+                Spacer(modifier = Modifier.height(25.dp))
+                Button(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    onClick = { }
+                ) {
+                    Text(
+                        text = "Sign Up", fontSize = 15.sp
+                    )
+                }
+
 
             }
 
