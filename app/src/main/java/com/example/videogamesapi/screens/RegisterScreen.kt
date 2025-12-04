@@ -12,6 +12,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -95,6 +96,34 @@ fun RegisterScreen(){
                     },
                     leadingIcon = {
                         Icon(imageVector = Icons.Default.Email,
+                            contentDescription = "Lock",
+                            tint = Color(0xFFB0B0B0)
+                        )
+                    },
+                )
+                Spacer(modifier = Modifier.height(25.dp))
+                OutlinedTextField(
+                    value = "",
+                    onValueChange = {},
+                    placeholder = {
+                        Text(text = "Password", color = Color.White)
+                    },
+                    leadingIcon = {
+                        Icon(imageVector = Icons.Default.Lock,
+                            contentDescription = "Lock",
+                            tint = Color(0xFFB0B0B0)
+                        )
+                    },
+                )
+                Spacer(modifier = Modifier.height(25.dp))
+                OutlinedTextField(
+                    value = "",
+                    onValueChange = {},
+                    placeholder = {
+                        Text(text = " Confirm password", color = Color.White)
+                    },
+                    leadingIcon = {
+                        Icon(imageVector = Icons.Default.Lock,
                             contentDescription = "Lock",
                             tint = Color(0xFFB0B0B0)
                         )
