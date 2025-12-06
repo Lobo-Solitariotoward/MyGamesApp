@@ -8,52 +8,58 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(
-    onRegisterSuccess: () -> Unit
+    onRegisterSuccess: (email: String, password: String) -> Unit
 ) {
+
+    var username by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var pass by remember { mutableStateOf("") }
+    var confirm by remember { mutableStateOf("") }
+    var error by remember { mutableStateOf<String?>(null) }
+
+    val textFieldColors = TextFieldDefaults.colors(
+        unfocusedContainerColor = Color.Transparent,
+        focusedContainerColor = Color.Transparent,
+
+        focusedTextColor = Color.White,
+        unfocusedTextColor = Color.White,
+
+        cursorColor = Color.White,
+
+        focusedIndicatorColor = Color.White,
+        unfocusedIndicatorColor = Color.LightGray,
+
+        focusedLeadingIconColor = Color.White,
+        unfocusedLeadingIconColor = Color.LightGray
+    )
+
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(
-                Brush.horizontalGradient(
-                    listOf(
-                        Color(0xFF2C2D51),
-                        Color(0xFF4A5090)
-                    )
-                )
+                Brush.horizontalGradient(listOf(Color(0xFF2C2D51), Color(0xFF4A5090)))
             )
     ) {
+        Box(modifier = Modifier.fillMaxWidth().height(210.dp))
 
-        // Fondo de la parte superior
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(210.dp)
-        )
-
-        // Contenedor del formulario
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(top = 210.dp)
-                .clip(RoundedCornerShape(topStart = 50.dp, topEnd = 50.dp))
+                .clip(RoundedCornerShape(50.dp))
                 .background(
-                    Brush.horizontalGradient(
-                        listOf(
-                            Color(0xFF373B5B),
-                            Color(0xFF323253)
-                        )
-                    )
+                    Brush.horizontalGradient(listOf(Color(0xFF373B5B), Color(0xFF323253)))
                 )
         ) {
 
@@ -63,80 +69,67 @@ fun RegisterScreen(
                     .padding(50.dp)
             ) {
 
-                Text(
-                    text = "Sign Up",
-                    color = Color.White,
-                    fontSize = 35.sp
-                )
+                Text("Sign Up", color = Color.White, fontSize = 35.sp)
 
-                Spacer(modifier = Modifier.height(50.dp))
+                Spacer(Modifier.height(50.dp))
 
                 OutlinedTextField(
-                    value = "",
-                    onValueChange = {},
+                    value = username,
+                    onValueChange = { username = it },
                     placeholder = { Text("Username", color = Color.White) },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.AccountCircle,
-                            contentDescription = "Username",
-                            tint = Color(0xFFB0B0B0)
-                        )
-                    }
+                    leadingIcon = { Icon(Icons.Default.AccountCircle, null, tint = Color(0xFFB0B0B0)) },
+                    colors = textFieldColors
                 )
 
-                Spacer(modifier = Modifier.height(25.dp))
-
                 OutlinedTextField(
-                    value = "",
-                    onValueChange = {},
+                    value = email,
+                    onValueChange = { email = it },
                     placeholder = { Text("Email", color = Color.White) },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.Email,
-                            contentDescription = "Email",
-                            tint = Color(0xFFB0B0B0)
-                        )
-                    }
+                    leadingIcon = { Icon(Icons.Default.Email, null, tint = Color(0xFFB0B0B0)) },
+                    colors = textFieldColors
                 )
 
-                Spacer(modifier = Modifier.height(25.dp))
-
                 OutlinedTextField(
-                    value = "",
-                    onValueChange = {},
+                    value = pass,
+                    onValueChange = { pass = it },
                     placeholder = { Text("Password", color = Color.White) },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.Lock,
-                            contentDescription = "Password",
-                            tint = Color(0xFFB0B0B0)
-                        )
-                    }
+                    leadingIcon = { Icon(Icons.Default.Lock, null, tint = Color(0xFFB0B0B0)) },
+                    colors = textFieldColors
                 )
-
-                Spacer(modifier = Modifier.height(25.dp))
 
                 OutlinedTextField(
-                    value = "",
-                    onValueChange = {},
+                    value = confirm,
+                    onValueChange = { confirm = it },
                     placeholder = { Text("Confirm Password", color = Color.White) },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.Lock,
-                            contentDescription = "Confirm Password",
-                            tint = Color(0xFFB0B0B0)
-                        )
-                    }
+                    leadingIcon = { Icon(Icons.Default.Lock, null, tint = Color(0xFFB0B0B0)) },
+                    colors = textFieldColors
                 )
 
-                Spacer(modifier = Modifier.height(25.dp))
 
-                // 🔹 BOTÓN DE REGISTRO
+                Spacer(Modifier.height(20.dp))
+
+                if (error != null) Text(error!!, color = Color.Red)
+
+                Spacer(Modifier.height(20.dp))
+
                 Button(
                     modifier = Modifier.fillMaxWidth(),
-                    onClick = { onRegisterSuccess() }
+                    onClick = {
+                        when {
+                            username.isBlank() || email.isBlank() || pass.isBlank() || confirm.isBlank() ->
+                                error = "Completa todos los campos"
+
+                            pass != confirm ->
+                                error = "Las contraseñas no coinciden"
+
+                            else -> {
+                                error = null
+                                onRegisterSuccess(email, pass)
+                            }
+                        }
+                    }
                 ) {
-                    Text("Sign Up", fontSize = 15.sp)
+                    Text("Sign Up")
                 }
             }
         }
