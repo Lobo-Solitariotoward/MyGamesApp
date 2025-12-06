@@ -2,18 +2,7 @@ package com.example.videogamesapi.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -26,262 +15,230 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.LocalFireDepartment
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import coil3.compose.AsyncImage
+import coil3.request.CachePolicy
+import coil3.request.ImageRequest
+import coil3.request.crossfade
+import coil3.request.error
+import coil3.request.fallback
+import coil3.request.placeholder
 import com.example.videogamesapi.models.Games
-import com.example.videogamesapi.navigation.Routes // Importa tus rutas
+import com.example.videogamesapi.navigation.Routes
 import com.example.videogamesapi.screens.viewmodel.HomeViewModel
+import com.example.videogamesapi.R
 
 @Composable
 fun HomeScreen(
-    // HomeScreen necesita el NavController para manejar toda la navegación.
     navController: NavController,
     viewModel: HomeViewModel = viewModel(),
 ) {
-    val gamesState by viewModel.games.collectAsState(initial = emptyList())
+    val games by viewModel.games.collectAsState(initial = emptyList())
     val isLoading by viewModel.isLoading.collectAsState(initial = false)
     val error by viewModel.error.collectAsState(initial = null)
 
-    val primaryColor = Color(0xFF1E0E4f)
+    val primaryColor = Color(0xFF1E0E4F)
     val cardColor = Color(0xFF3B298E)
-    val navigationColor = Color(0xFF3B298E).copy(alpha = 0.9f)
+    val navColor = Color(0xFF3B298E).copy(alpha = 0.95f)
 
     Scaffold(
-        // Pasamos el navController a la barra inferior para manejar la navegación entre rutas
-        bottomBar = { AppBottomNavigationBar(navController = navController, navigationColor = navigationColor) },
+        bottomBar = {
+            AppBottomNavigationBar(navController = navController, navigationColor = navColor)
+        },
         modifier = Modifier.fillMaxSize()
-    ) { paddingValues ->
+    ) { padding ->
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(primaryColor)
-                .padding(paddingValues)
+                .padding(padding)
                 .verticalScroll(rememberScrollState())
+                .padding(bottom = 70.dp)
         ) {
-            HomeHeader(cardColor = cardColor)
 
-            Spacer(modifier = Modifier.height(16.dp))
+            HomeHeader(cardColor)
+
+            Spacer(Modifier.height(16.dp))
 
             when {
-                isLoading -> {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        CircularProgressIndicator(color = Color.White)
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(text = "Cargando juegos...", color = Color.LightGray)
-                    }
-                }
-                error != null -> {
-                    Text(
-                        text = error ?: "Error desconocido",
-                        color = Color.Red,
-                        modifier = Modifier.padding(16.dp)
-                    )
-                }
+                isLoading -> Loading()
+                error != null -> ErrorMessage(error)
                 else -> {
-                    SectionHeader(title = "Categories")
-                    CategoryPlaceholders(cardColor = cardColor)
+                    SectionHeader("Categories")
+                    CategoryPlaceholders(cardColor)
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(Modifier.height(16.dp))
 
-                    // 1. SECCIÓN: Trending Games
-                    SectionHeader(title = "Trending Games")
-                    TrendingGamesSection(
-                        games = gamesState,
-                        // Al hacer click, navegamos a la pantalla de Detalle, asumiendo una ruta
-                        onGameClicked = { gameId ->
-                            // Asumimos que la ruta de detalle es "detail_screen/{gameId}"
-                            navController.navigate("detail_screen/$gameId")
-                        },
-                        cardColor = cardColor
-                    )
+                    SectionHeader("Trending Games")
+                    TrendingGamesList(games, navController, cardColor)
 
-                    Spacer(modifier = Modifier.height(20.dp))
+                    Spacer(Modifier.height(16.dp))
 
-                    // 2. SECCIÓN: New Games
-                    SectionHeader(title = "New Games")
-                    NewGamesSection(
-                        games = gamesState,
-                        onGameClicked = { gameId ->
-                            // Navegamos a la pantalla de Detalle
-                            navController.navigate("detail_screen/$gameId")
-                        },
-                        itemColor = cardColor
-                    )
+                    SectionHeader("New Games")
+                    NewGamesList(games, navController, cardColor)
 
-                    Spacer(modifier = Modifier.height(20.dp))
-
-                    // 3. SECCIÓN: Latest Game News (Placeholder)
-                    SectionHeader(title = "Latest Game News")
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(150.dp)
-                            .padding(horizontal = 16.dp)
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(cardColor.copy(alpha = 0.7f)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Icon(Icons.Default.ChatBubble, contentDescription = "News", tint = Color.LightGray)
-                            Text(
-                                text = "News articles placeholder",
-                                color = Color.LightGray
-                            )
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(80.dp))
+                    Spacer(Modifier.height(120.dp))
                 }
             }
         }
     }
 }
-
 @Composable
 fun AppBottomNavigationBar(navController: NavController, navigationColor: Color) {
-    val selectedItemColor = Color(0xFF5E3CEF)
-    val unselectedItemColor = Color.LightGray
-    val currentRoute = navController.currentDestination?.route ?: Routes.Home.route
+
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route ?: Routes.Home.route
+
+    val selected = Color(0xFF5E3CEF)
+    val unselected = Color.LightGray
 
     Surface(
         color = navigationColor,
         shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
-        shadowElevation = 8.dp
+        shadowElevation = 12.dp
     ) {
-        NavigationBar(
-            containerColor = Color.Transparent,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(64.dp)
-        ) {
-            // Home
+        NavigationBar(containerColor = Color.Transparent) {
+
+            fun go(route: String) {
+                if (route != currentRoute) {
+                    navController.navigate(route) { launchSingleTop = true }
+                }
+            }
+
             NavigationBarItem(
                 selected = currentRoute == Routes.Home.route,
-                onClick = { navController.navigate(Routes.Home.route) },
-                icon = { Icon(Icons.Filled.Home, contentDescription = "Home", tint = if (currentRoute == Routes.Home.route) selectedItemColor else unselectedItemColor) },
-                colors = NavigationBarItemDefaults.colors(indicatorColor = Color.Transparent)
+                onClick = { go(Routes.Home.route) },
+                icon = {
+                    Icon(Icons.Default.Home, null,
+                        tint = if (currentRoute == Routes.Home.route) selected else unselected)
+                }
             )
-            // Search/Explore (usaremos la ruta MyGames como placeholder visual)
+
             NavigationBarItem(
                 selected = currentRoute == Routes.MyGames.route,
-                onClick = { navController.navigate(Routes.MyGames.route) },
-                icon = { Icon(Icons.Filled.Search, contentDescription = "Search", tint = if (currentRoute == Routes.MyGames.route) selectedItemColor else unselectedItemColor) },
-                colors = NavigationBarItemDefaults.colors(indicatorColor = Color.Transparent)
+                onClick = { go(Routes.MyGames.route) },
+                icon = {
+                    Icon(Icons.Default.Search, null,
+                        tint = if (currentRoute == Routes.MyGames.route) selected else unselected)
+                }
             )
-            // Trending
+
             NavigationBarItem(
                 selected = currentRoute == Routes.Trending.route,
-                onClick = { navController.navigate(Routes.Trending.route) },
-                icon = { Icon(Icons.Default.LocalFireDepartment, contentDescription = "Trending", tint = if (currentRoute == Routes.Trending.route) selectedItemColor else unselectedItemColor) },
-                colors = NavigationBarItemDefaults.colors(indicatorColor = Color.Transparent)
+                onClick = { go(Routes.Trending.route) },
+                icon = {
+                    Icon(Icons.Default.LocalFireDepartment, null,
+                        tint = if (currentRoute == Routes.Trending.route) selected else unselected)
+                }
             )
-            // Chat
+
             NavigationBarItem(
                 selected = currentRoute == Routes.Chat.route,
-                onClick = { navController.navigate(Routes.Chat.route) },
-                icon = { Icon(Icons.Filled.ChatBubble, contentDescription = "Chat", tint = if (currentRoute == Routes.Chat.route) selectedItemColor else unselectedItemColor) },
-                colors = NavigationBarItemDefaults.colors(indicatorColor = Color.Transparent)
+                onClick = { go(Routes.Chat.route) },
+                icon = {
+                    Icon(Icons.Default.ChatBubble, null,
+                        tint = if (currentRoute == Routes.Chat.route) selected else unselected)
+                }
             )
-            // Profile
+
             NavigationBarItem(
                 selected = currentRoute == Routes.Profile.route,
-                onClick = { navController.navigate(Routes.Profile.route) },
-                icon = { Icon(Icons.Filled.Person, contentDescription = "Profile", tint = if (currentRoute == Routes.Profile.route) selectedItemColor else unselectedItemColor) },
-                colors = NavigationBarItemDefaults.colors(indicatorColor = Color.Transparent)
+                onClick = { go(Routes.Profile.route) },
+                icon = {
+                    Icon(Icons.Default.Person, null,
+                        tint = if (currentRoute == Routes.Profile.route) selected else unselected)
+                }
             )
         }
     }
 }
-
-
-
 @Composable
-fun TrendingGamesSection(games: List<Games>, onGameClicked: (String) -> Unit, cardColor: Color) {
-    if (games.isEmpty()) {
-        Box(modifier = Modifier.height(300.dp)) {
-            TrendingEmptyRow(cardColor = cardColor)
-        }
-    } else {
-        TrendingGamesList(games = games, onGameClicked = onGameClicked, cardColor = cardColor)
+fun Loading() {
+    Column(
+        Modifier.fillMaxWidth().padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        CircularProgressIndicator(color = Color.White)
+        Spacer(Modifier.height(8.dp))
+        Text("Cargando juegos...", color = Color.LightGray)
     }
 }
 
 @Composable
-fun NewGamesSection(games: List<Games>, onGameClicked: (String) -> Unit, itemColor: Color) {
-    if (games.isEmpty()) {
-        Box(modifier = Modifier.height(90.dp)) {
-            NewGamesEmptyRow(cardColor = itemColor)
-        }
-    } else {
-        NewGamesList(games = games, onGameClicked = onGameClicked, itemColor = itemColor)
-    }
+fun ErrorMessage(error: String?) {
+    Text(
+        text = error ?: "Error desconocido",
+        color = Color.Red,
+        modifier = Modifier.padding(16.dp)
+    )
 }
 
 @Composable
-fun TrendingGamesList(games: List<Games>, onGameClicked: (String) -> Unit, cardColor: Color) {
+fun TrendingGamesList(games: List<Games>, nav: NavController, cardColor: Color) {
     LazyRow(
         contentPadding = PaddingValues(horizontal = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        items(games, key = { it.id }) { game ->
-            TrendingGameCard(game = game, onGameClicked = onGameClicked, cardColor = cardColor)
+        items(games) { game ->
+            TrendingGameCard(game, cardColor) {
+                nav.navigate("detail_screen/${game.id}")
+            }
         }
     }
 }
 
 @Composable
-fun TrendingGameCard(game: Games, onGameClicked: (String) -> Unit, cardColor: Color) {
-    val cardWidth = 200.dp
-    val cardHeight = 300.dp
+fun NewGamesList(games: List<Games>, nav: NavController, itemColor: Color) {
+    LazyRow(
+        contentPadding = PaddingValues(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        items(games) { game ->
+            NewGameItem(game, itemColor) {
+                nav.navigate("detail_screen/${game.id}")
+            }
+        }
+    }
+}
 
+@Composable
+fun TrendingGameCard(game: Games, cardColor: Color, onClick: () -> Unit) {
     Card(
         shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(containerColor = cardColor),
         modifier = Modifier
-            .width(cardWidth)
-            .height(cardHeight)
-            .clickable {
-                val gameId = tryInvokeStringOrCollection(game, listOf("id", "getId")) ?: ""
-                onGameClicked(gameId)
-            }
+            .width(200.dp)
+            .height(300.dp)
+            .clickable { onClick() }
     ) {
+
         AsyncImage(
-            model = game.safeImageUrl(),
-            contentDescription = safeTitle(game),
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(game.safeImageUrl())
+                .crossfade(true)
+                .size(512, 512)     // evita crash y permite fallback
+                .memoryCachePolicy(CachePolicy.ENABLED)
+                .diskCachePolicy(CachePolicy.ENABLED)
+                .placeholder(R.drawable.back_image)
+                .error(R.drawable.back_image)
+                .fallback(R.drawable.back_image)
+                .build(),
+            contentDescription = game.title,
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
         )
@@ -289,55 +246,40 @@ fun TrendingGameCard(game: Games, onGameClicked: (String) -> Unit, cardColor: Co
 }
 
 @Composable
-fun NewGamesList(games: List<Games>, onGameClicked: (String) -> Unit, itemColor: Color) {
-    LazyRow(
-        contentPadding = PaddingValues(horizontal = 16.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        items(games, key = { it.id }) { game ->
-            NewGameItem(game = game, onGameClicked = onGameClicked, itemColor = itemColor)
-        }
-    }
-}
-
-@Composable
-fun NewGameItem(game: Games, onGameClicked: (String) -> Unit, itemColor: Color) {
-    val itemWidth = 250.dp
-
+fun NewGameItem(game: Games, cardColor: Color, onClick: () -> Unit) {
     Row(
         modifier = Modifier
-            .width(itemWidth)
+            .width(260.dp)
             .height(90.dp)
             .clip(RoundedCornerShape(12.dp))
-            .background(itemColor)
-            .clickable {
-                val gameId = tryInvokeStringOrCollection(game, listOf("id", "getId")) ?: ""
-                onGameClicked(gameId)
-            }
+            .background(cardColor)
+            .clickable { onClick() }
             .padding(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
+
         AsyncImage(
-            model = game.safeImageUrl(),
-            contentDescription = safeTitle(game),
-            contentScale = ContentScale.Crop,
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(game.safeImageUrl())
+                .crossfade(true)
+                .size(256, 256)
+                .placeholder(R.drawable.back_image)
+                .error(R.drawable.back_image)
+                .fallback(R.drawable.back_image)
+                .build(),
+            contentDescription = game.title,
             modifier = Modifier
-                .size(74.dp)
-                .clip(RoundedCornerShape(8.dp))
+                .size(70.dp)
+                .clip(RoundedCornerShape(8.dp)),
+            contentScale = ContentScale.Crop
         )
 
-        Spacer(modifier = Modifier.width(10.dp))
+        Spacer(Modifier.width(10.dp))
 
-        Column(modifier = Modifier.weight(1f)) {
+        Column {
+            Text(game.title, color = Color.White, fontWeight = FontWeight.Bold)
             Text(
-                text = safeTitle(game),
-                color = Color.White,
-                fontWeight = FontWeight.Bold,
-                maxLines = 1
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = game.safeCategories(),
+                game.developer ?: "",
                 color = Color.LightGray,
                 fontSize = 12.sp,
                 maxLines = 1,
@@ -346,127 +288,45 @@ fun NewGameItem(game: Games, onGameClicked: (String) -> Unit, itemColor: Color) 
         }
     }
 }
-
-@Composable
-fun TrendingEmptyRow(cardColor: Color) {
-    LazyRow(
-        contentPadding = PaddingValues(horizontal = 16.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        items(3) {
-            TrendingEmptyCard(cardColor = cardColor)
-        }
-    }
-}
-
-@Composable
-fun TrendingEmptyCard(cardColor: Color) {
-    Card(
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        colors = CardDefaults.cardColors(containerColor = cardColor),
-        modifier = Modifier
-            .width(200.dp)
-            .height(300.dp)
-    ) {
-        Box(modifier = Modifier.fillMaxSize()) { }
-    }
-}
-
-@Composable
-fun NewGamesEmptyRow(cardColor: Color) {
-    LazyRow(
-        contentPadding = PaddingValues(horizontal = 16.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        items(3) {
-            NewGameEmptyItem(cardColor = cardColor)
-        }
-    }
-}
-
-@Composable
-fun NewGameEmptyItem(cardColor: Color) {
-    Card(
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = cardColor.copy(alpha = 0.5f)),
-        modifier = Modifier
-            .width(250.dp)
-            .height(90.dp)
-    ) {
-        Box(modifier = Modifier.fillMaxSize()) { }
-    }
-}
-
-@Composable
-fun SectionHeader(title: String) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.titleLarge,
-            color = Color.White,
-            fontWeight = FontWeight.Bold
-        )
-        Text(
-            text = "See all",
-            style = MaterialTheme.typography.labelMedium,
-            color = Color.LightGray.copy(alpha = 0.7f),
-            modifier = Modifier.clickable { }
-        )
-    }
-}
-
 @Composable
 fun HomeHeader(cardColor: Color) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+        Modifier.fillMaxWidth().padding(16.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
-            imageVector = Icons.Default.Search,
-            contentDescription = "Search",
+            Icons.Default.Search, null,
             tint = Color.White,
             modifier = Modifier
                 .size(40.dp)
                 .clip(RoundedCornerShape(12.dp))
                 .background(cardColor)
                 .padding(8.dp)
-                .clickable { }
         )
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(text = "welcome back", color = Color.LightGray, fontSize = 10.sp)
-            Text(text = "@cat11", color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text("welcome back", color = Color.LightGray, fontSize = 10.sp)
+            Text("@cat11", color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold)
         }
+
         Icon(
-            imageVector = Icons.Default.Person,
-            contentDescription = "User",
+            Icons.Default.Person, null,
             tint = Color.White,
             modifier = Modifier
                 .size(40.dp)
                 .clip(CircleShape)
-                .background(Color.Gray)
+                .background(Color.DarkGray)
         )
     }
 }
-
 @Composable
 fun CategoryPlaceholders(cardColor: Color) {
     LazyRow(
         contentPadding = PaddingValues(horizontal = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        items(listOf("Action", "Shooter", "MOBA")) { title ->
+        items(listOf("Action", "Shooter", "MOBA")) {
             Surface(
                 shape = RoundedCornerShape(20.dp),
                 color = cardColor,
@@ -475,72 +335,32 @@ fun CategoryPlaceholders(cardColor: Color) {
                     .clickable { }
             ) {
                 Text(
-                    text = title,
+                    text = it,
                     color = Color.White,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                    style = MaterialTheme.typography.labelLarge
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                 )
             }
         }
     }
 }
 
-
-private fun Games.safeImageUrl(): String {
-    val candidates = listOf(
-        "imageUrl", "getImageUrl", "image", "getImage",
-        "thumbnail", "getThumbnail", "avatar", "getAvatar",
-        "url", "getUrl"
-    )
-    return tryInvokeStringOrCollection(this, candidates) ?: ""
-}
-
-private fun Games.safeCategories(): String {
-    val candidates = listOf(
-        "categories", "getCategories", "category", "getCategory",
-        "genres", "getGenres", "tags", "getTags"
-    )
-    return tryInvokeStringOrCollection(this, candidates) ?: ""
-}
-
-private fun safeTitle(game: Games): String {
-    val titleCandidates = listOf("title", "getTitle", "name", "getName", "nombre", "getNombre")
-    val title = tryInvokeStringOrCollection(game, titleCandidates)
-    return title?.takeIf { it.isNotBlank() } ?: game.id.toString()
-}
-
-private fun tryInvokeStringOrCollection(target: Any, names: List<String>): String? {
-    val clazz = target::class.java
-    for (n in names) {
-        try {
-            val field = clazz.declaredFields.firstOrNull { it.name.equals(n, ignoreCase = true) }
-            if (field != null) {
-                field.isAccessible = true
-                val value = field.get(target) ?: continue
-                return when (value) {
-                    is String -> value
-                    is Collection<*> -> value.joinToString(", ") { it.toString() }
-                    is Array<*> -> value.joinToString(", ") { it.toString() }
-                    else -> value.toString()
-                }
-            }
-            val method = clazz.methods.firstOrNull { it.name.equals(n, ignoreCase = true) && it.parameterCount == 0 }
-            if (method != null) {
-                val res = method.invoke(target) ?: continue
-                return when (res) {
-                    is String -> res
-                    is Collection<*> -> res.joinToString(", ") { it.toString() }
-                    is Array<*> -> res.joinToString(", ") { it.toString() }
-                    else -> res.toString()
-                }
-            }
-        } catch (_: Exception) { /* ignore */ }
-    }
-    return null
-}
-
-@Preview(showBackground = true)
 @Composable
-fun HomeScreenPreview() {
-    HomeScreen(navController = rememberNavController())
+fun SectionHeader(text: String) {
+    Text(
+        text = text,
+        color = Color.White,
+        fontSize = 20.sp,
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+    )
+}
+fun Games.safeImageUrl(): String {
+    if (!this.image.isNullOrBlank() &&
+        (image.startsWith("http://") || image.startsWith("https://"))
+    ) {
+        return this.image
+    }
+
+    // 🔥 Imagen de respaldo
+    return "https://i.postimg.cc/MKTKzH0G/game-placeholder.png"
 }

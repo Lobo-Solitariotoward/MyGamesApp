@@ -20,10 +20,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import coil3.compose.rememberAsyncImagePainter
 
 @Composable
-fun TrendingScreen(onBackClick: (() -> Unit)? = null) {
+fun TrendingScreen(navController: NavController, onBackClick: (() -> Unit)? = null) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -117,7 +119,7 @@ fun TrendingScreen(onBackClick: (() -> Unit)? = null) {
         }
 
         // Menú inferior
-        BottomMenu(selectedItem = "Trending")
+        BottomMenu(navController, selectedItem = "Trending")
     }
 }
 
@@ -246,12 +248,4 @@ fun InfoCard(title: String, author: String, text: String) {
             }
         }
     }
-}
-
-
-
-@Preview(showBackground = true)
-@Composable
-fun TrendingScreenPreview() {
-    TrendingScreen()
 }

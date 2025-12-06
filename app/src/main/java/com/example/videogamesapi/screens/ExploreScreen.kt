@@ -23,22 +23,24 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
-import androidx.compose.material3.TopAppBar
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.example.videogamesapi.models.Games
 import com.example.videogamesapi.screens.viewmodel.HomeViewModel
+import com.example.videogamesapi.utils.safeImageUrl
+import com.example.videogamesapi.utils.safeCategories
+import com.example.videogamesapi.utils.safeTitle
+import com.example.videogamesapi.screens.AppBottomNavigationBar
 
-// Paleta de colores
+// 🎨 Paleta
 private val BgColor = Color(0xFF0C0F27)
 private val Accent = Color(0xFF7A6BFF)
 private val OnBg = Color.White
 private val Muted = Color(0xFFB0B0B0)
-private val BottomBar = Color(0xFF1E1B1B)
 
-// UI
 @Composable
 fun ExploreScreen(
+    navController: NavController,
     genreTitle: String = "Lo más vendido",
     onBack: () -> Unit = {},
     onSearch: () -> Unit = {},
@@ -47,28 +49,20 @@ fun ExploreScreen(
     viewModel: HomeViewModel = viewModel()
 ) {
     val scroll = rememberScrollState()
-
-    // Juegos desde el ViewModel
     val games by viewModel.games.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
 
-    // Agrupar juegos por categoría
-    val gamesByGenre: Map<String, List<Games>> =
-        games.groupBy { it.gender.ifBlank { "Otros" } }
+    val gamesByGenre = games.groupBy { it.gender.ifBlank { "Otros" } }
 
-    // Orden de géneros: primero el que viene en genretitlef, luego el resto alfabéticamente
-    val orderedGenres: List<String> = buildList {
+    val orderedGenres = buildList {
         if (gamesByGenre.containsKey(genreTitle)) add(genreTitle)
         addAll(
-            gamesByGenre.keys
-                .filter { it != genreTitle }
-                .sorted()
+            gamesByGenre.keys.filter { it != genreTitle }.sorted()
         )
     }
 
-    // Carrusel superior: si hay juegos del género seleccionado, usamos esos; si no, los primeros 3 de todos
-    val topBanners: List<Games> =
+    val topBanners =
         (gamesByGenre[genreTitle].orEmpty().take(3))
             .ifEmpty { games.take(3) }
 
@@ -81,15 +75,22 @@ fun ExploreScreen(
                 onCast = onCast
             )
         },
-        bottomBar = { BottomNavBar() },
+        bottomBar = {
+            AppBottomNavigationBar(
+                navController = navController,
+                navigationColor = Color(0xFF1E1B1B)
+            )
+        },
         containerColor = BgColor
     ) { padding ->
+
         Column(
             modifier = Modifier
                 .padding(padding)
                 .fillMaxSize()
                 .background(BgColor)
                 .verticalScroll(scroll)
+                .padding(bottom = 90.dp) // evita que el menú tape contenido
         ) {
             when {
                 isLoading -> {
@@ -110,10 +111,7 @@ fun ExploreScreen(
                             .padding(24.dp),
                         contentAlignment = Alignment.TopCenter
                     ) {
-                        Text(
-                            text = error ?: "Ocurrió un error",
-                            color = OnBg
-                        )
+                        Text(error ?: "Ocurrió un error", color = OnBg)
                     }
                 }
 
@@ -131,12 +129,10 @@ fun ExploreScreen(
                 else -> {
                     Spacer(Modifier.height(8.dp))
 
-                    // Carrusel superior
                     if (topBanners.isNotEmpty()) {
                         BannerRow(items = topBanners)
                     }
 
-                    // Secciones por categoría real
                     orderedGenres.forEach { genre ->
                         val list = gamesByGenre[genre].orEmpty()
                         if (list.isNotEmpty()) {
@@ -156,6 +152,8 @@ fun ExploreScreen(
         }
     }
 }
+
+/* ---------------------- UI COMPONENTS ---------------------- */
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -184,8 +182,8 @@ private fun TopBar(
         },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = BgColor,
-            navigationIconContentColor = OnBg,
             titleContentColor = OnBg,
+            navigationIconContentColor = OnBg,
             actionIconContentColor = OnBg
         )
     )
@@ -211,10 +209,9 @@ private fun SectionHeader(
         )
         Spacer(Modifier.weight(1f))
         if (actionText != null && onAction != null) {
-            TextButton(
-                onClick = onAction,
-                colors = ButtonDefaults.textButtonColors(contentColor = Accent)
-            ) { Text(actionText, fontWeight = FontWeight.Medium) }
+            TextButton(onClick = onAction) {
+                Text(actionText, color = Accent, fontWeight = FontWeight.Medium)
+            }
         }
     }
 }
@@ -239,7 +236,7 @@ private fun BannerCard(game: Games) {
             .clip(shape)
     ) {
         AsyncImage(
-            model = game.image,
+            model = game.safeImageUrl(),
             contentDescription = game.title,
             modifier = Modifier
                 .fillMaxWidth()
@@ -284,8 +281,9 @@ private fun PosterCard(game: Games) {
         modifier = Modifier.width(160.dp)
     ) {
         val shape = MaterialTheme.shapes.medium
+
         AsyncImage(
-            model = game.image,
+            model = game.safeImageUrl(),
             contentDescription = game.title,
             contentScale = ContentScale.Crop,
             modifier = Modifier
@@ -293,7 +291,9 @@ private fun PosterCard(game: Games) {
                 .fillMaxWidth()
                 .clip(shape)
         )
+
         Spacer(Modifier.height(8.dp))
+
         Text(
             text = game.title,
             maxLines = 1,
@@ -309,83 +309,4 @@ private fun PosterCard(game: Games) {
             fontSize = 12.sp
         )
     }
-}
-
-@Composable
-private fun BottomNavBar() {
-    NavigationBar(
-        containerColor = BottomBar
-    ) {
-        NavigationBarItem(
-            selected = true,
-            onClick = {},
-            icon = { Text("🏠") },
-            label = { Text("Inicio") },
-            colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = OnBg,
-                selectedTextColor = OnBg,
-                unselectedIconColor = Muted,
-                unselectedTextColor = Muted,
-                indicatorColor = Accent
-            )
-        )
-        NavigationBarItem(
-            selected = false,
-            onClick = {},
-            icon = { Text("🔖") },
-            label = { Text("Mis Listas") },
-            colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = OnBg,
-                selectedTextColor = OnBg,
-                unselectedIconColor = Muted,
-                unselectedTextColor = Muted,
-                indicatorColor = Accent
-            )
-        )
-        NavigationBarItem(
-            selected = false,
-            onClick = {},
-            icon = { Text("🟧") },
-            label = { Text("Explorar") },
-            colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = OnBg,
-                selectedTextColor = OnBg,
-                unselectedIconColor = Muted,
-                unselectedTextColor = Muted,
-                indicatorColor = Accent
-            )
-        )
-        NavigationBarItem(
-            selected = false,
-            onClick = {},
-            icon = { Text("✨") },
-            label = { Text("Simulcast") },
-            colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = OnBg,
-                selectedTextColor = OnBg,
-                unselectedIconColor = Muted,
-                unselectedTextColor = Muted,
-                indicatorColor = Accent
-            )
-        )
-        NavigationBarItem(
-            selected = false,
-            onClick = {},
-            icon = { Text("👤") },
-            label = { Text("Cuenta") },
-            colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = OnBg,
-                selectedTextColor = OnBg,
-                unselectedIconColor = Muted,
-                unselectedTextColor = Muted,
-                indicatorColor = Accent
-            )
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun ExploreScreenPreview() {
-    ExploreScreen()
 }

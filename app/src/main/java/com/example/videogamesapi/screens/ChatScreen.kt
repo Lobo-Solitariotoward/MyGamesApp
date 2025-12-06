@@ -28,6 +28,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import coil3.compose.rememberAsyncImagePainter
 
 data class ChatMessage(
@@ -40,7 +42,7 @@ data class ChatMessage(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ChatScreen(onBackClick: (() -> Unit)? = null) {
+fun ChatScreen(navController: NavController, onBackClick: (() -> Unit)? = null) {
     var message by remember { mutableStateOf("") }
     val messages = remember {
         mutableStateListOf(
@@ -184,7 +186,7 @@ fun ChatScreen(onBackClick: (() -> Unit)? = null) {
             }
 
             // 🔹 Barra inferior de navegación (opcional)
-            BottomMenu(selectedItem = "Chat")
+            BottomMenu(navController, selectedItem = "Chat")
         }
     }
 }
@@ -250,10 +252,4 @@ fun UserAvatar(msg: ChatMessage) {
             )
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun ChatScreenPreview() {
-    ChatScreen()
 }

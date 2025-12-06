@@ -57,6 +57,8 @@ dependencies {
     // ✅ Material3 (nuevo sistema)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.foundation.layout)
+    implementation(libs.androidx.ui)
+    implementation(libs.androidx.compose.ui.text)
 
     // Navegación Compose
     val nav_version = "2.8.9"

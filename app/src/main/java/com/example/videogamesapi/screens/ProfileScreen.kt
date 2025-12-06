@@ -27,12 +27,15 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import coil3.compose.rememberAsyncImagePainter
+import com.example.videogamesapi.screens.BottomMenu
 import kotlin.math.max
 
 // Estructura principal con menú inferior
 @Composable
-fun ProfileHeader() {
+fun ProfileScreen(navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -41,7 +44,7 @@ fun ProfileHeader() {
         Box(modifier = Modifier.weight(1f)) {
             ProfileContent()
         }
-        BottomMenu(selectedItem = "Profile")
+        BottomMenu(navController, selectedItem = "Profile")
     }
 }
 
@@ -254,62 +257,6 @@ fun RewardCard(title: String, imageUrl: String) {
     }
 }
 
-// Barra inferior
-@Composable
-fun BottomMenu(selectedItem: String = "Profile") {
-    val items = listOf("Home", "Search", "Trending", "Chat", "Profile")
-    val icons = listOf(
-        Icons.Default.Home,
-        Icons.Default.Search,
-        Icons.Default.Videocam,
-        Icons.Default.ChatBubbleOutline,
-        Icons.Default.Person
-    )
-
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 10.dp)
-            .clip(RoundedCornerShape(25.dp))
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(
-                        Color(0xFF1E1B1B),
-                        Color(0xFF2D2929)
-                    )
-                )
-            )
-            .padding(vertical = 10.dp)
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            items.forEachIndexed { index, item ->
-                val isSelected = item == selectedItem
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Icon(
-                        imageVector = icons[index],
-                        contentDescription = item,
-                        tint = if (isSelected) Color(0xFF7A6BFF) else Color(0xFFB8B8B8),
-                        modifier = Modifier.size(if (isSelected) 28.dp else 24.dp)
-                    )
-                    if (isSelected) {
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Box(
-                            modifier = Modifier
-                                .width(6.dp)
-                                .height(6.dp)
-                                .background(Color(0xFF7A6BFF), CircleShape)
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
 // Reutilizables
 @Composable
 fun GameChip(text: String, background: Color, textColor: Color = Color.White) {
@@ -436,10 +383,4 @@ fun FriendCard(username: String, gameBg: String, profilePic: String) {
             }
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun ProfileHeaderPreview() {
-    ProfileHeader()
 }
